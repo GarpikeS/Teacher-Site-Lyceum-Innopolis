@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(test:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx next dev -p 5000)",
+      "Bash(where:*)",
+      "Bash(docker --version:*)",
+      "Bash(psql:*)",
+      "Bash(ss:*)",
+      "Bash(powershell:*)",
+      "Bash(npx tsx:*)",
+      "Bash(taskkill:*)",
+      "Bash(npx next build:*)",
+      "Bash(npx:*)",
+      "WebSearch",
+      "Bash(curl:*)",
+      "Bash(python:*)",
+      "Bash(/tmp/api_check.txt:*)"
+    ]
+  }
+}

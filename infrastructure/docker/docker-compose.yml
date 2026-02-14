@@ -1,0 +1,163 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # PostgreSQL Database
+  # ============================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: code-platform-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-code_platform}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../../apps/api/src/database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - code-platform-network
+    restart: unless-stopped
+
+  # ============================================
+  # Redis Cache
+  # ============================================
+  redis:
+    image: redis:7-alpine
+    container_name: code-platform-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - code-platform-network
+    restart: unless-stopped
+
+  # ============================================
+  # Backend API (Express)
+  # ============================================
+  api:
+    build:
+      context: ../../apps/api
+      dockerfile: ../../infrastructure/docker/Dockerfile.api
+    container_name: code-platform-api
+    ports:
+      - "${API_PORT:-3001}:3001"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3001
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-code_platform}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      EXECUTOR_URL: http://code-executor:3002
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      EMAIL_FROM: ${EMAIL_FROM}
+      SENTRY_DSN: ${SENTRY_DSN}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ../../apps/api:/app
+      - /app/node_modules
+      - api_logs:/app/logs
+    networks:
+      - code-platform-network
+    restart: unless-stopped
+
+  # ============================================
+  # Code Executor Service
+  # ============================================
+  code-executor:
+    build:
+      context: ../../apps/code-executor
+      dockerfile: ../../infrastructure/docker/Dockerfile.executor
+    container_name: code-platform-executor
+    ports:
+      - "${EXECUTOR_PORT:-3002}:3002"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3002
+      REDIS_URL: redis://redis:6379
+      PYTHON_TIMEOUT_MS: ${PYTHON_TIMEOUT_MS:-5000}
+      PYTHON_MEMORY_MB: ${PYTHON_MEMORY_MB:-128}
+      CPP_COMPILE_TIMEOUT_MS: ${CPP_COMPILE_TIMEOUT_MS:-10000}
+      CPP_EXECUTE_TIMEOUT_MS: ${CPP_EXECUTE_TIMEOUT_MS:-5000}
+      CPP_MEMORY_MB: ${CPP_MEMORY_MB:-256}
+    depends_on:
+      - redis
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ../../apps/code-executor:/app
+      - /app/node_modules
+      - executor_logs:/app/logs
+    networks:
+      - code-platform-network
+    privileged: true
+    restart: unless-stopped
+
+  # ============================================
+  # Frontend (Next.js) - Development
+  # ============================================
+  web:
+    build:
+      context: ../../apps/web
+      dockerfile: ../../infrastructure/docker/Dockerfile.web
+      target: development
+    container_name: code-platform-web
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+      NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-ws://localhost:3001}
+    depends_on:
+      - api
+    volumes:
+      - ../../apps/web:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - code-platform-network
+    restart: unless-stopped
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  code-platform-network:
+    driver: bridge
+    name: code-platform-network
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  postgres_data:
+    name: code-platform-postgres-data
+  redis_data:
+    name: code-platform-redis-data
+  api_logs:
+    name: code-platform-api-logs
+  executor_logs:
+    name: code-platform-executor-logs
