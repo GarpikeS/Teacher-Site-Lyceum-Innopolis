@@ -607,7 +607,7 @@ long long mergeCount(vector<int>& a, int l, int r) {
       starterCode: '#include <iostream>\nusing namespace std;\n\nint main() {\n    long long base, exp, mod;\n    cin >> base >> exp >> mod;\n    // Быстрое возведение\n    return 0;\n}\n',
       testCases: [
         { input: '2 10 1000', expectedOutput: '24', description: '2^10 mod 1000 = 24' },
-        { input: '3 100 1000000007', expectedOutput: '981147432', description: 'Большой показатель' },
+        { input: '3 100 1000000007', expectedOutput: '515377520', description: 'Большой показатель' },
         { input: '5 0 7', expectedOutput: '1', description: 'n^0 = 1' },
       ],
       points: 15,

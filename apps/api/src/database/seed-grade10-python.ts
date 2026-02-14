@@ -591,7 +591,7 @@ def max_subarray(arr, lo, hi):
       starterCode: '# Считайте base, exp, mod\n# Реализуйте быстрое возведение в степень\n\n',
       testCases: [
         { input: '2\n10\n1000', expectedOutput: '24', description: '2^10 mod 1000 = 1024 mod 1000 = 24' },
-        { input: '3\n100\n1000000007', expectedOutput: '981147432', description: 'Большой показатель' },
+        { input: '3\n100\n1000000007', expectedOutput: '515377520', description: 'Большой показатель' },
         { input: '5\n0\n7', expectedOutput: '1', description: 'Любое число в степени 0 = 1' },
       ],
       points: 15,

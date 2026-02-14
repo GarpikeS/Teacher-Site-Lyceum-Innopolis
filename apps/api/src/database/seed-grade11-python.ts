@@ -191,7 +191,7 @@ print(find_start('2121', 47))
       difficulty: 'medium',
       starterCode: '# Считайте A и B\n# Подсчитайте количество программ,\n# переводящих A в B\n# Команды: +1, *2\n\n',
       testCases: [
-        { input: '2\n10', expectedOutput: '4', description: 'Из 2 в 10: 4 программы' },
+        { input: '2\n10', expectedOutput: '7', description: 'Из 2 в 10: 7 программ' },
         { input: '1\n8', expectedOutput: '10', description: 'Из 1 в 8: 10 программ' },
         { input: '3\n20', expectedOutput: '18', description: 'Из 3 в 20: 18 программ' },
       ],
@@ -541,8 +541,8 @@ print(bin(255).count('1'))  # 8
       difficulty: 'medium',
       starterCode: '# Считайте A и B\n# Подсчитайте количество шагов\n# алгоритма Евклида\n\n',
       testCases: [
-        { input: '12\n8', expectedOutput: '3', description: '12,8 → 8,4 → 4,0 → 3 шага' },
-        { input: '100\n75', expectedOutput: '3', description: '100,75 → 75,25 → 25,0 → 3 шага' },
+        { input: '12\n8', expectedOutput: '2', description: '12,8 → 8,4 → 4,0 — 2 шага' },
+        { input: '100\n75', expectedOutput: '2', description: '100,75 → 75,25 → 25,0 — 2 шага' },
         { input: '17\n13', expectedOutput: '3', description: '17,13 → 13,4 → 4,1 → 1,0 — 3 шага' },
       ],
       points: 15,
