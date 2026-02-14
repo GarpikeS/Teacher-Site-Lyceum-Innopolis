@@ -23,6 +23,14 @@ export enum CourseLevel {
   ADVANCED = 'advanced',
 }
 
+export enum GradeLevel {
+  GRADE_7 = 7,
+  GRADE_8 = 8,
+  GRADE_9 = 9,
+  GRADE_10 = 10,
+  GRADE_11 = 11,
+}
+
 // ============================================
 // LESSON ENUMS
 // ============================================

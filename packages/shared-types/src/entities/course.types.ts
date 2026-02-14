@@ -1,4 +1,4 @@
-import { ProgrammingLanguage, CourseLevel } from '../enums';
+import { ProgrammingLanguage, CourseLevel, GradeLevel } from '../enums';
 
 export interface Course {
   id: string;
@@ -7,6 +7,7 @@ export interface Course {
   description?: string;
   language: ProgrammingLanguage;
   level: CourseLevel;
+  grade?: GradeLevel;
   iconUrl?: string;
   coverImageUrl?: string;
   isPublished: boolean;
@@ -31,6 +32,7 @@ export interface CreateCourseDto {
   description?: string;
   language: ProgrammingLanguage;
   level?: CourseLevel;
+  grade?: GradeLevel;
   iconUrl?: string;
   coverImageUrl?: string;
   orderIndex: number;

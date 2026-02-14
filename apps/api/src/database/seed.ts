@@ -1,10 +1,14 @@
 import { db } from '../config/database';
 import { logger } from '../utils/logger';
 import bcrypt from 'bcryptjs';
+import { python10Lessons } from './seed-grade10-python';
+import { cpp10Lessons } from './seed-grade10-cpp';
+import { python11Lessons } from './seed-grade11-python';
+import { cpp11Lessons } from './seed-grade11-cpp';
 
 // ============================================
 // Seed Data for Code Learning Platform
-// 2 courses, 40 lessons, assignments, test cases
+// 6 courses (7/10/11 grade), lessons, assignments, test cases
 // ============================================
 
 async function seed() {
@@ -39,10 +43,14 @@ async function seed() {
     // 2. COURSES
     // ============================================
     const coursesResult = await db.query(
-      `INSERT INTO courses (slug, title, description, language, level, order_index, estimated_hours, is_published, created_by)
+      `INSERT INTO courses (slug, title, description, language, level, order_index, estimated_hours, is_published, created_by, grade)
       VALUES
-        ('python-7-advanced', 'Python для 7 класса', 'Углублённый курс программирования на Python. Изучение основ алгоритмизации, работа с данными, функции и основы ООП.', 'python', 'advanced', 1, 40, true, $1),
-        ('cpp-7-advanced', 'C++ для 7 класса', 'Углублённый курс программирования на C++. Изучение синтаксиса, работа с памятью, структуры данных и основы ООП.', 'cpp', 'advanced', 2, 45, true, $1)
+        ('python-7-advanced', 'Python для 7 класса', 'Углублённый курс программирования на Python. Изучение основ алгоритмизации, работа с данными, функции и основы ООП.', 'python', 'advanced', 1, 40, true, $1, 7),
+        ('cpp-7-advanced', 'C++ для 7 класса', 'Углублённый курс программирования на C++. Изучение синтаксиса, работа с памятью, структуры данных и основы ООП.', 'cpp', 'advanced', 2, 45, true, $1, 7),
+        ('python-10-advanced', 'Python для 10 класса', 'Углублённый курс: алгоритмы, структуры данных, рекурсия, ДП, графы. Подготовка к олимпиадам и проектная работа.', 'python', 'advanced', 3, 60, true, $1, 10),
+        ('cpp-10-advanced', 'C++ для 10 класса', 'Углублённый курс: указатели, STL, алгоритмы, структуры данных, шаблоны. Подготовка к олимпиадам.', 'cpp', 'advanced', 4, 65, true, $1, 10),
+        ('python-11-ege', 'Python для 11 класса (ЕГЭ)', 'Подготовка к ЕГЭ по информатике на Python. Разбор заданий 6, 12, 14, 16, 17, 23-27. Продвинутые алгоритмы.', 'python', 'advanced', 5, 70, true, $1, 11),
+        ('cpp-11-ege', 'C++ для 11 класса (ЕГЭ)', 'Подготовка к ЕГЭ по информатике на C++. Разбор заданий 6, 12, 14, 16, 17, 24-27. Продвинутые алгоритмы.', 'cpp', 'advanced', 6, 70, true, $1, 11)
       ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title
       RETURNING id, slug`,
       [teacher.id]
@@ -50,8 +58,12 @@ async function seed() {
 
     const pythonCourse = coursesResult.rows[0];
     const cppCourse = coursesResult.rows[1];
+    const python10Course = coursesResult.rows[2];
+    const cpp10Course = coursesResult.rows[3];
+    const python11Course = coursesResult.rows[4];
+    const cpp11Course = coursesResult.rows[5];
 
-    logger.info('Created 2 courses');
+    logger.info('Created 6 courses');
 
     // ============================================
     // 3. PYTHON LESSONS (20)
@@ -2128,11 +2140,11 @@ printArea(r);  // Площадь: 24
       orderIndex: number
     ) => {
       const lessonResult = await db.query(
-        `INSERT INTO lessons (course_id, slug, title, description, content, order_index, duration_minutes, is_published)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, true)
+        `INSERT INTO lessons (course_id, slug, title, description, content, order_index, duration_minutes, is_published, ege_topic, ege_task_number)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, true, $8, $9)
         ON CONFLICT (course_id, slug) DO UPDATE SET title = EXCLUDED.title
         RETURNING id`,
-        [courseId, lesson.slug, lesson.title, lesson.description, lesson.content, orderIndex, lesson.duration]
+        [courseId, lesson.slug, lesson.title, lesson.description, lesson.content, orderIndex, lesson.duration, lesson.egeTopic || null, lesson.egeTaskNumber || null]
       );
 
       const lessonId = lessonResult.rows[0].id;
@@ -2140,8 +2152,8 @@ printArea(r);  // Площадь: 24
       if (lesson.assignment) {
         const a = lesson.assignment;
         await db.query(
-          `INSERT INTO assignments (lesson_id, title, description, assignment_type, difficulty, starter_code, test_cases, validation_type, points, order_index, is_published)
-          VALUES ($1, $2, $3, 'code', $4, $5, $6, 'automatic', $7, 1, true)
+          `INSERT INTO assignments (lesson_id, title, description, assignment_type, difficulty, starter_code, test_cases, validation_type, points, order_index, is_published, ege_task_number)
+          VALUES ($1, $2, $3, 'code', $4, $5, $6, 'automatic', $7, 1, true, $8)
           ON CONFLICT DO NOTHING`,
           [
             lessonId,
@@ -2151,6 +2163,7 @@ printArea(r);  // Площадь: 24
             a.starterCode,
             JSON.stringify(a.testCases),
             a.points,
+            a.egeTaskNumber || null,
           ]
         );
       }
@@ -2158,53 +2171,78 @@ printArea(r);  // Площадь: 24
       return lessonId;
     };
 
-    // Insert Python lessons
+    // Insert 7th grade Python lessons
     for (let i = 0; i < pythonLessons.length; i++) {
       await insertLesson(pythonCourse.id, pythonLessons[i], i + 1);
     }
-    logger.info(`Created ${pythonLessons.length} Python lessons`);
+    logger.info(`Created ${pythonLessons.length} Python 7 lessons`);
 
-    // Insert C++ lessons
+    // Insert 7th grade C++ lessons
     for (let i = 0; i < cppLessons.length; i++) {
       await insertLesson(cppCourse.id, cppLessons[i], i + 1);
     }
-    logger.info(`Created ${cppLessons.length} C++ lessons`);
+    logger.info(`Created ${cppLessons.length} C++ 7 lessons`);
+
+    // Insert 10th grade Python lessons
+    for (let i = 0; i < python10Lessons.length; i++) {
+      await insertLesson(python10Course.id, python10Lessons[i], i + 1);
+    }
+    logger.info(`Created ${python10Lessons.length} Python 10 lessons`);
+
+    // Insert 10th grade C++ lessons
+    for (let i = 0; i < cpp10Lessons.length; i++) {
+      await insertLesson(cpp10Course.id, cpp10Lessons[i], i + 1);
+    }
+    logger.info(`Created ${cpp10Lessons.length} C++ 10 lessons`);
+
+    // Insert 11th grade Python lessons (EGE)
+    for (let i = 0; i < python11Lessons.length; i++) {
+      await insertLesson(python11Course.id, python11Lessons[i], i + 1);
+    }
+    logger.info(`Created ${python11Lessons.length} Python 11 (EGE) lessons`);
+
+    // Insert 11th grade C++ lessons (EGE)
+    for (let i = 0; i < cpp11Lessons.length; i++) {
+      await insertLesson(cpp11Course.id, cpp11Lessons[i], i + 1);
+    }
+    logger.info(`Created ${cpp11Lessons.length} C++ 11 (EGE) lessons`);
 
     // ============================================
     // 5. CREATE CLASS AND ENROLL STUDENTS
     // ============================================
     if (teacher && students.length > 0) {
-      const classResult = await db.query(
+      const classesResult = await db.query(
         `INSERT INTO classes (name, description, teacher_id, academic_year, is_active)
-        VALUES ('7А класс', 'Углублённое программирование', $1, '2025-2026', true)
+        VALUES
+          ('7А класс', 'Углублённое программирование — 7 класс', $1, '2025-2026', true),
+          ('10А класс', 'Углублённое программирование — 10 класс', $1, '2025-2026', true),
+          ('11А класс', 'Подготовка к ЕГЭ — 11 класс', $1, '2025-2026', true)
         ON CONFLICT DO NOTHING
         RETURNING id`,
         [teacher.id]
       );
 
-      if (classResult.rows[0]) {
-        const classId = classResult.rows[0].id;
+      for (const classRow of classesResult.rows) {
         for (const student of students) {
           await db.query(
             `INSERT INTO class_students (class_id, student_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-            [classId, student.id]
+            [classRow.id, student.id]
           );
         }
-        logger.info(`Created class and enrolled ${students.length} students`);
       }
+      logger.info(`Created ${classesResult.rows.length} classes and enrolled students`);
 
-      // Enroll students in both courses
+      // Enroll students in all courses
+      const allCourses = [pythonCourse, cppCourse, python10Course, cpp10Course, python11Course, cpp11Course];
       for (const student of students) {
-        await db.query(
-          `INSERT INTO course_enrollments (user_id, course_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-          [student.id, pythonCourse.id]
-        );
-        await db.query(
-          `INSERT INTO course_enrollments (user_id, course_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-          [student.id, cppCourse.id]
-        );
+        for (const course of allCourses) {
+          await db.query(
+            `INSERT INTO course_enrollments (user_id, course_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+            [student.id, course.id]
+          );
+        }
       }
-      logger.info('Enrolled students in courses');
+      logger.info('Enrolled students in all courses');
     }
 
     // ============================================
@@ -2232,9 +2270,10 @@ printArea(r);  // Площадь: 24
     logger.info('Database seeding completed successfully!');
     logger.info('Summary:');
     logger.info(`  - Users: ${users.length} (1 admin, 1 teacher, ${students.length} students)`);
-    logger.info(`  - Courses: 2 (Python, C++)`);
-    logger.info(`  - Python lessons: ${pythonLessons.length}`);
-    logger.info(`  - C++ lessons: ${cppLessons.length}`);
+    logger.info(`  - Courses: 6 (Python + C++ for grades 7, 10, 11)`);
+    logger.info(`  - 7 grade: ${pythonLessons.length} Python + ${cppLessons.length} C++ lessons`);
+    logger.info(`  - 10 grade: ${python10Lessons.length} Python + ${cpp10Lessons.length} C++ lessons`);
+    logger.info(`  - 11 grade (EGE): ${python11Lessons.length} Python + ${cpp11Lessons.length} C++ lessons`);
     logger.info('  - Each lesson has 1 assignment with test cases');
     logger.info('  - Achievements: 12');
     logger.info('');

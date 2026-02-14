@@ -11,6 +11,8 @@ export interface Lesson {
   durationMinutes?: number;
   isPublished: boolean;
   prerequisites: string[];
+  egeTopic?: string;
+  egeTaskNumber?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,6 +34,8 @@ export interface CreateLessonDto {
   orderIndex: number;
   durationMinutes?: number;
   prerequisites?: string[];
+  egeTopic?: string;
+  egeTaskNumber?: number;
 }
 
 export interface UpdateLessonDto {
