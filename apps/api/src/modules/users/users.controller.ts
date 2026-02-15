@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { UsersService } from './users.service';
 import { logger } from '../../utils/logger';
 
@@ -7,7 +7,7 @@ export class UsersController {
    * GET /api/v1/users
    * Get all users (admin only)
    */
-  static async getAllUsers(req: Request, res: Response, next: NextFunction) {
+  static async getAllUsers(req: Request, res: Response) {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
@@ -40,7 +40,7 @@ export class UsersController {
    * GET /api/v1/users/:id
    * Get user by ID (admin only)
    */
-  static async getUserById(req: Request, res: Response, next: NextFunction) {
+  static async getUserById(req: Request, res: Response) {
     try {
       const user = await UsersService.getUserById(req.params.id);
 
@@ -61,7 +61,7 @@ export class UsersController {
    * PATCH /api/v1/users/:id/role
    * Update user role (admin only)
    */
-  static async updateRole(req: Request, res: Response, next: NextFunction) {
+  static async updateRole(req: Request, res: Response) {
     try {
       const { role } = req.body;
 
@@ -91,7 +91,7 @@ export class UsersController {
    * PATCH /api/v1/users/:id/active
    * Toggle user active status (admin only)
    */
-  static async toggleActive(req: Request, res: Response, next: NextFunction) {
+  static async toggleActive(req: Request, res: Response) {
     try {
       const { isActive } = req.body;
 
@@ -121,7 +121,7 @@ export class UsersController {
    * DELETE /api/v1/users/:id
    * Delete user (admin only)
    */
-  static async deleteUser(req: Request, res: Response, next: NextFunction) {
+  static async deleteUser(req: Request, res: Response) {
     try {
       await UsersService.deleteUser(req.params.id);
 

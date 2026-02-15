@@ -87,7 +87,7 @@ export class SubmissionsService {
         throw new Error(`Executor returned ${response.status}`);
       }
 
-      const result = await response.json();
+      const result: any = await response.json();
 
       if (result.success && result.data) {
         const { passedTests, totalTests, details, totalExecutionTime } = result.data;
