@@ -116,7 +116,7 @@ def cbc_bitflip(ciphertext: bytes, block_size: int,
 
 # Пример: подменяем "role=user" на "role=admin" (допустим role= во 2-м блоке)
 # Модифицируем 1-й блок шифротекста
-modified = cbc_bitflip(ciphertext, 16, b"user\\\x00", b"admin", target_block=1)
+modified = cbc_bitflip(ciphertext, 16, b"user\\x00", b"admin", target_block=1)
 \`\`\`
 
 ## CVE и реальные примеры
@@ -152,10 +152,10 @@ modified = cbc_bitflip(ciphertext, 16, b"user\\\x00", b"admin", target_block=1)
 
 Перед шифрованием в CBC блоки дополняются до нужного размера по стандарту **PKCS#7**:
 
-- Если не хватает 1 байта → добавляем \`\\\x01\`
-- Если не хватает 2 байт → добавляем \`\\\x02\\\x02\`
+- Если не хватает 1 байта → добавляем \`\\x01\`
+- Если не хватает 2 байт → добавляем \`\\x02\\x02\`
 - Если не хватает N байт → добавляем N байт со значением N
-- Если блок полный → добавляем целый блок из \`\\\x10\` (16 байт)
+- Если блок полный → добавляем целый блок из \`\\x10\` (16 байт)
 
 \`\`\`python
 def pkcs7_pad(data: bytes, block_size: int = 16) -> bytes:
@@ -188,7 +188,7 @@ def pkcs7_unpad(data: bytes) -> bytes:
 Если мы подставим **произвольный блок** \`C'\` вместо \`C_{i-1}\`:
 \`P'_i = I_i XOR C'\`
 
-Подбирая последний байт \`C'\` так, чтобы \`P'_i\` заканчивался на \`\\\x01\` (валидный padding), мы узнаём \`I_i[15]\`:
+Подбирая последний байт \`C'\` так, чтобы \`P'_i\` заканчивался на \`\\x01\` (валидный padding), мы узнаём \`I_i[15]\`:
 \`I_i[15] = C'[15] XOR 0x01\`
 
 ## Пошаговый алгоритм
@@ -1292,7 +1292,7 @@ def generate_sandbox_bypasses(blocked_keywords: list) -> list:
     """Генерирует обходы песочницы Jinja2."""
     bypasses = []
     if "__" in blocked_keywords:
-        bypasses.append("{{ ''|attr('\\\x5f\\\x5fclass\\\x5f\\\x5f') }}")
+        bypasses.append("{{ ''|attr('\\x5f\\x5fclass\\x5f\\x5f') }}")
         bypasses.append("{{ ''|attr('\\u005f\\u005fclass\\u005f\\u005f') }}")
     if "." in blocked_keywords:
         bypasses.append("{{ ''['__class__']['__mro__'] }}")
@@ -2700,7 +2700,7 @@ def carve_files(disk_image: bytes, signatures: dict = None) -> list:
             "PNG": (b"\\x89PNG\r\n\\x1a\n", b"IEND"),
             "PDF": (b"%PDF", b"%%EOF"),
             "ZIP": (b"PK\\x03\\x04", b"PK\\x05\\x06"),
-            "GIF": (b"GIF89a", b"\\\x00\\x3b"),
+            "GIF": (b"GIF89a", b"\\x00\\x3b"),
         }
 
     found_files = []

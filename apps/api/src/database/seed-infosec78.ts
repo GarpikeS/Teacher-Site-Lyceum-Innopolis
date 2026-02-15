@@ -1107,7 +1107,7 @@ print(ord('A'))   # 65 (латинская A) — разные символы!
 # UTF-8 кодирование
 text = 'Привет'
 encoded = text.encode('utf-8')
-print(encoded)        # b'\\\xd0\\\x9f\\\xd1\\\x80...'
+print(encoded)        # b'\\xd0\\x9f\\xd1\\x80...'
 print(len(encoded))   # 12 байт (2 байта на символ)
 print(len(text))      # 6 символов
 \`\`\`
@@ -1788,7 +1788,7 @@ def detect_file_type(filename):
 \`\`\`python
 # Создание байтов из hex
 data = bytes.fromhex('89504e47')
-print(data)        # b'\\\x89PNG'
+print(data)        # b'\\x89PNG'
 print(data.hex())  # 89504e47
 
 # Побайтовый доступ

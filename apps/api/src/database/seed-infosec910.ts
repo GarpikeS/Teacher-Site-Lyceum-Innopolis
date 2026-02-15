@@ -1495,7 +1495,7 @@ def find_pattern(data, pattern):
     return results
 
 # Поиск "MZ" (сигнатура PE-файла Windows)
-dump = b'\\\x00\\\x00\\\x4D\\\x5A\\\x90\\\x00\\\x03\\\x00\\\x00\\\x4D\\\x5A'
+dump = b'\\x00\\x00\\x4D\\x5A\\x90\\x00\\x03\\x00\\x00\\x4D\\x5A'
 offsets = find_pattern(dump, [0x4D, 0x5A])
 print(f"PE-файлы найдены по смещениям: {offsets}")  # [2, 9]
 \\\`\\\`\\\`
@@ -1512,7 +1512,7 @@ def parse_process_list(raw_data):
     for i in range(0, len(raw_data) - record_size + 1, record_size):
         pid = struct.unpack('<I', raw_data[i:i+4])[0]
         ppid = struct.unpack('<I', raw_data[i+4:i+8])[0]
-        name = raw_data[i+8:i+40].split(b'\\\x00')[0].decode('ascii', errors='ignore')
+        name = raw_data[i+8:i+40].split(b'\\x00')[0].decode('ascii', errors='ignore')
         if pid > 0 and name:
             processes.append({'pid': pid, 'ppid': ppid, 'name': name})
     return processes
@@ -1585,9 +1585,9 @@ def identify_file(data):
     return "UNKNOWN"
 
 # Примеры
-print(identify_file(b'\\\x89PNG\\r\\n\\\x1a\\n...'))  # PNG
+print(identify_file(b'\\x89PNG\\r\\n\\x1a\\n...'))  # PNG
 print(identify_file(b'%PDF-1.4...'))              # PDF
-print(identify_file(b'MZ\\\x90\\\x00...'))            # PE
+print(identify_file(b'MZ\\x90\\x00...'))            # PE
 \\\`\\\`\\\`
 
 ## Алгоритм карвинга
@@ -2137,13 +2137,13 @@ def detect_binary_type(header):
     """Определение типа бинарного файла"""
     if header[:2] == b'MZ':
         return 'PE (Windows EXE/DLL)'
-    elif header[:4] == b'\\\x7fELF':
+    elif header[:4] == b'\\x7fELF':
         return 'ELF (Linux/Unix)'
-    elif header[:4] == b'\\\xca\\\xfe\\\xba\\\xbe':
+    elif header[:4] == b'\\xca\\xfe\\xba\\xbe':
         return 'Mach-O Universal (macOS)'
-    elif header[:4] == b'\\\xfe\\\xed\\\xfa\\\xce':
+    elif header[:4] == b'\\xfe\\xed\\xfa\\xce':
         return 'Mach-O 32-bit (macOS)'
-    elif header[:8] == b'\\\x00asm\\\x01\\\x00\\\x00\\\x00'[:8]:
+    elif header[:8] == b'\\x00asm\\x01\\x00\\x00\\x00'[:8]:
         return 'WebAssembly'
     elif header[:2] == b'PK':
         return 'ZIP/APK/JAR'
