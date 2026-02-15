@@ -787,7 +787,7 @@ print(bits_to_text(bits)) # Hi
 def embed_bit(pixel_value, bit):
     """Заменить младший бит значения пикселя."""
     # Обнуляем младший бит и ставим нужный
-    return (pixel_value & 0\xFE) | int(bit)
+    return (pixel_value & 0xFE) | int(bit)
 
 # Пример: встроить бит 1 в значение 200
 original = 200         # 11001000
@@ -804,7 +804,7 @@ print(extract_bit(200))  # 0
 
 ## Ёмкость LSB-стеганографии
 
-Изображение 1920\x1080 (Full HD):
+Изображение 1920x1080 (Full HD):
 - Пикселей: 1920 * 1080 = 2 073 600
 - Каналов: 3 (RGB)
 - Бит для скрытия: 6 220 800
@@ -969,7 +969,7 @@ number = 255
 # Десятичное → другие системы
 print(bin(number))   # 0b11111111
 print(oct(number))   # 0o377
-print(hex(number))   # 0\xff
+print(hex(number))   # 0xff
 
 # Без префиксов
 print(bin(number)[2:])  # 11111111
@@ -1763,14 +1763,14 @@ payloads = [
 
 \`\`\`python
 SIGNATURES = {
-    bytes([0\x89, 0\x50, 0\x4E, 0\x47]): 'PNG',
-    bytes([0\xFF, 0\xD8, 0\xFF]): 'JPEG',
-    bytes([0\x47, 0\x49, 0\x46, 0\x38]): 'GIF',
-    bytes([0\x25, 0\x50, 0\x44, 0\x46]): 'PDF',
-    bytes([0\x50, 0\x4B, 0\x03, 0\x04]): 'ZIP',
-    bytes([0\x7F, 0\x45, 0\x4C, 0\x46]): 'ELF',
-    bytes([0\x4D, 0\x5A]): 'EXE',
-    bytes([0\x49, 0\x44, 0\x33]): 'MP3',
+    bytes([0x89, 0x50, 0x4E, 0x47]): 'PNG',
+    bytes([0xFF, 0xD8, 0xFF]): 'JPEG',
+    bytes([0x47, 0x49, 0x46, 0x38]): 'GIF',
+    bytes([0x25, 0x50, 0x44, 0x46]): 'PDF',
+    bytes([0x50, 0x4B, 0x03, 0x04]): 'ZIP',
+    bytes([0x7F, 0x45, 0x4C, 0x46]): 'ELF',
+    bytes([0x4D, 0x5A]): 'EXE',
+    bytes([0x49, 0x44, 0x33]): 'MP3',
 }
 
 def detect_file_type(filename):
@@ -1804,7 +1804,7 @@ print(packed.hex())  # 00000780 00000438
 
 # Распаковка
 width, height = struct.unpack('>II', packed)
-print(f'{width}x{height}')  # 1920\x1080
+print(f'{width}x{height}')  # 1920x1080
 \`\`\`
 
 ## Форензика: скрытые файлы
@@ -1817,7 +1817,7 @@ def find_hidden_signatures(filename):
     with open(filename, 'rb') as f:
         data = f.read()
     # Ищем PNG-сигнатуру
-    png_sig = bytes([0\x89, 0\x50, 0\x4E, 0\x47])
+    png_sig = bytes([0x89, 0x50, 0x4E, 0x47])
     offset = data.find(png_sig)
     while offset != -1:
         print(f'PNG найден на смещении {offset} (0x{offset:x})')

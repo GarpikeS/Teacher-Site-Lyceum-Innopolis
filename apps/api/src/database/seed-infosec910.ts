@@ -461,11 +461,11 @@ def oracle_attack_last_byte(cipher_block, prev_block, oracle_func, block_size):
         modified = bytearray(prev_block)
         modified[-1] = guess
         # Если oracle валиден, то:
-        # Decrypt(cipher_block)[-1] XOR guess == 0\x01
+        # Decrypt(cipher_block)[-1] XOR guess == 0x01
         test_data = bytes(modified) + cipher_block
         if oracle_func(test_data, block_size):
-            # Decrypt(cipher_block)[-1] = guess XOR 0\x01
-            intermediate = guess ^ 0\x01
+            # Decrypt(cipher_block)[-1] = guess XOR 0x01
+            intermediate = guess ^ 0x01
             # Реальный открытый текст:
             plaintext_byte = intermediate ^ prev_block[-1]
             return plaintext_byte
@@ -805,7 +805,7 @@ def parse_ip_header(header_bytes):
     """Разбор IP-заголовка (первые 20 байт)"""
     fields = struct.unpack('!BBHHHBBH4s4s', header_bytes[:20])
     version = fields[0] >> 4
-    ihl = fields[0] & 0\x0F
+    ihl = fields[0] & 0x0F
     total_length = fields[2]
     ttl = fields[5]
     protocol = fields[6]  # 6=TCP, 17=UDP, 1=ICMP
@@ -836,12 +836,12 @@ def parse_tcp_header(header_bytes):
     flags = fields[5]
     # Флаги: URG ACK PSH RST SYN FIN
     flag_names = []
-    if flags & 0\x20: flag_names.append("URG")
-    if flags & 0\x10: flag_names.append("ACK")
-    if flags & 0\x08: flag_names.append("PSH")
-    if flags & 0\x04: flag_names.append("RST")
-    if flags & 0\x02: flag_names.append("SYN")
-    if flags & 0\x01: flag_names.append("FIN")
+    if flags & 0x20: flag_names.append("URG")
+    if flags & 0x10: flag_names.append("ACK")
+    if flags & 0x08: flag_names.append("PSH")
+    if flags & 0x04: flag_names.append("RST")
+    if flags & 0x02: flag_names.append("SYN")
+    if flags & 0x01: flag_names.append("FIN")
     return {
         'src_port': src_port,
         'dst_port': dst_port,
@@ -1440,7 +1440,7 @@ print(f"Перехвачено: {stripper.intercepted}")
 import struct
 
 # Целые числа в памяти (little-endian, x86)
-value = 0\x12345678
+value = 0x12345678
 packed = struct.pack('<I', value)  # little-endian unsigned int
 print(f"Значение: 0x{value:08X}")
 print(f"В памяти: {' '.join(f'{b:02X}' for b in packed)}")
@@ -1473,10 +1473,10 @@ def extract_strings(data, min_length=4):
 
 # Пример: "бинарные данные" с читаемыми строками
 raw = bytes([
-    0\x00, 0\xFF, 0\x70, 0\x61, 0\x73, 0\x73, 0\x77, 0\x6F,  # ..passwo
-    0\x72, 0\x64, 0\x31, 0\x32, 0\x33, 0\x00, 0\xFF, 0\x00,  # rd123...
-    0\x68, 0\x74, 0\x74, 0\x70, 0\x3A, 0\x2F, 0\x2F, 0\x65,  # http://e
-    0\x76, 0\x69, 0\x6C, 0\x2E, 0\x63, 0\x6F, 0\x6D, 0\x00,  # vil.com.
+    0x00, 0xFF, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6F,  # ..passwo
+    0x72, 0x64, 0x31, 0x32, 0x33, 0x00, 0xFF, 0x00,  # rd123...
+    0x68, 0x74, 0x74, 0x70, 0x3A, 0x2F, 0x2F, 0x65,  # http://e
+    0x76, 0x69, 0x6C, 0x2E, 0x63, 0x6F, 0x6D, 0x00,  # vil.com.
 ])
 found = extract_strings(raw)
 print(found)  # ['password123', 'http://evil.com']
@@ -1496,7 +1496,7 @@ def find_pattern(data, pattern):
 
 # Поиск "MZ" (сигнатура PE-файла Windows)
 dump = b'\\\x00\\\x00\\\x4D\\\x5A\\\x90\\\x00\\\x03\\\x00\\\x00\\\x4D\\\x5A'
-offsets = find_pattern(dump, [0\x4D, 0\x5A])
+offsets = find_pattern(dump, [0x4D, 0x5A])
 print(f"PE-файлы найдены по смещениям: {offsets}")  # [2, 9]
 \\\`\\\`\\\`
 
@@ -1567,14 +1567,14 @@ def parse_process_list(raw_data):
 \\\`\\\`\\\`python
 # Словарь сигнатур
 FILE_SIGNATURES = {
-    'JPEG': bytes([0\xFF, 0\xD8, 0\xFF]),
-    'PNG':  bytes([0\x89, 0\x50, 0\x4E, 0\x47]),
-    'PDF':  bytes([0\x25, 0\x50, 0\x44, 0\x46]),
-    'ZIP':  bytes([0\x50, 0\x4B, 0\x03, 0\x04]),
-    'ELF':  bytes([0\x7F, 0\x45, 0\x4C, 0\x46]),
-    'PE':   bytes([0\x4D, 0\x5A]),
-    'GIF':  bytes([0\x47, 0\x49, 0\x46, 0\x38]),
-    'RAR':  bytes([0\x52, 0\x61, 0\x72, 0\x21]),
+    'JPEG': bytes([0xFF, 0xD8, 0xFF]),
+    'PNG':  bytes([0x89, 0x50, 0x4E, 0x47]),
+    'PDF':  bytes([0x25, 0x50, 0x44, 0x46]),
+    'ZIP':  bytes([0x50, 0x4B, 0x03, 0x04]),
+    'ELF':  bytes([0x7F, 0x45, 0x4C, 0x46]),
+    'PE':   bytes([0x4D, 0x5A]),
+    'GIF':  bytes([0x47, 0x49, 0x46, 0x38]),
+    'RAR':  bytes([0x52, 0x61, 0x72, 0x21]),
 }
 
 def identify_file(data):
@@ -1609,9 +1609,9 @@ def carve_files(raw_data, signatures):
 # Моделирование сырых данных диска
 disk_data = bytearray(1000)
 # "Спрятаны" файлы:
-disk_data[100:103] = bytes([0\xFF, 0\xD8, 0\xFF])   # JPEG на смещении 100
-disk_data[500:504] = bytes([0\x25, 0\x50, 0\x44, 0\x46])  # PDF на смещении 500
-disk_data[800:802] = bytes([0\x4D, 0\x5A])          # PE на смещении 800
+disk_data[100:103] = bytes([0xFF, 0xD8, 0xFF])   # JPEG на смещении 100
+disk_data[500:504] = bytes([0x25, 0x50, 0x44, 0x46])  # PDF на смещении 500
+disk_data[800:802] = bytes([0x4D, 0x5A])          # PE на смещении 800
 
 results = carve_files(bytes(disk_data), FILE_SIGNATURES)
 for r in results:
@@ -1627,7 +1627,7 @@ for r in results:
 
 \\\`\\\`\\\`python
 FILE_FOOTERS = {
-    'JPEG': bytes([0\xFF, 0\xD9]),
+    'JPEG': bytes([0xFF, 0xD9]),
     'PDF':  b'%%EOF',
 }
 
@@ -1996,7 +1996,7 @@ class X86Emulator:
     def __init__(self):
         self.regs = {
             'eax': 0, 'ebx': 0, 'ecx': 0, 'edx': 0,
-            'esp': 0\x1000, 'ebp': 0, 'eip': 0
+            'esp': 0x1000, 'ebp': 0, 'eip': 0
         }
         self.memory = {}
         self.flags = {'ZF': 0, 'SF': 0, 'CF': 0}
