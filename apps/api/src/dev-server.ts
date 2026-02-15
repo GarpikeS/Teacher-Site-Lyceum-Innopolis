@@ -8,6 +8,13 @@ import helmet from 'helmet';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
+import { python10Lessons } from './database/seed-grade10-python';
+import { cpp10Lessons } from './database/seed-grade10-cpp';
+import { python11Lessons } from './database/seed-grade11-python';
+import { cpp11Lessons } from './database/seed-grade11-cpp';
+import { infosec78Lessons } from './database/seed-infosec78';
+import { infosec910Lessons } from './database/seed-infosec910';
+import { infosec11Lessons } from './database/seed-infosec11';
 
 dotenv.config({ path: '../../.env' });
 
@@ -3218,6 +3225,75 @@ int main() {
     progressPercentage: 0,
   });
 
+  // ============================================
+  // SEED COURSES FROM EXTERNAL SEED FILES
+  // ============================================
+
+  // Helper to convert seed lessons to in-memory format
+  function addSeedCourse(courseId: string, prefix: string, seedLessons: any[]) {
+    seedLessons.forEach((lesson, idx) => {
+      const lessonId = `lesson-${prefix}-${idx + 1}`;
+      db.lessons.push({
+        id: lessonId,
+        courseId,
+        slug: lesson.slug,
+        title: lesson.title,
+        description: lesson.description,
+        content: lesson.content,
+        orderIndex: idx + 1,
+        durationMinutes: lesson.duration || 45,
+        isPublished: true,
+        prerequisites: [],
+        createdAt: new Date().toISOString(),
+      });
+      if (lesson.assignment) {
+        const a = lesson.assignment;
+        db.assignments.push({
+          id: `assign-${prefix}-${idx + 1}`,
+          lessonId,
+          title: a.title,
+          description: a.description,
+          assignmentType: 'code',
+          difficulty: a.difficulty || 'medium',
+          starterCode: a.starterCode || '',
+          testCases: (a.testCases || []).map((tc: any, i: number) => ({
+            id: i + 1,
+            input: tc.input,
+            expectedOutput: tc.expectedOutput,
+            description: tc.description || '',
+            isHidden: tc.isHidden || false,
+            points: tc.points || Math.floor((a.points || 10) / (a.testCases?.length || 1)),
+          })),
+          validationType: 'automatic',
+          maxAttempts: 10,
+          points: a.points || 10,
+          orderIndex: 1,
+          isPublished: true,
+        });
+      }
+    });
+  }
+
+  // Add 7 additional courses
+  db.courses.push(
+    { id: 'course-python-10', slug: 'python-10-advanced', title: 'Python для 10 класса', description: 'Углублённый курс: алгоритмы, структуры данных, рекурсия, ДП, графы.', language: 'python', level: 'advanced', isPublished: true, orderIndex: 3, estimatedHours: 60, createdAt: new Date().toISOString() },
+    { id: 'course-cpp-10', slug: 'cpp-10-advanced', title: 'C++ для 10 класса', description: 'Углублённый курс: указатели, STL, алгоритмы, структуры данных, шаблоны.', language: 'cpp', level: 'advanced', isPublished: true, orderIndex: 4, estimatedHours: 65, createdAt: new Date().toISOString() },
+    { id: 'course-python-11', slug: 'python-11-ege', title: 'Python для 11 класса (ЕГЭ)', description: 'Подготовка к ЕГЭ по информатике на Python. Разбор заданий 6, 12, 14, 16, 17, 23-27.', language: 'python', level: 'advanced', isPublished: true, orderIndex: 5, estimatedHours: 70, createdAt: new Date().toISOString() },
+    { id: 'course-cpp-11', slug: 'cpp-11-ege', title: 'C++ для 11 класса (ЕГЭ)', description: 'Подготовка к ЕГЭ по информатике на C++. Разбор заданий 6, 12, 14, 16, 17, 24-27.', language: 'cpp', level: 'advanced', isPublished: true, orderIndex: 6, estimatedHours: 70, createdAt: new Date().toISOString() },
+    { id: 'course-infosec-78', slug: 'infosec-78', title: 'Информационная безопасность 7-8 класс', description: 'Криптография, стеганография, веб-безопасность и форензика.', language: 'python', level: 'advanced', isPublished: true, orderIndex: 7, estimatedHours: 50, createdAt: new Date().toISOString() },
+    { id: 'course-infosec-910', slug: 'infosec-910', title: 'Информационная безопасность 9-10 класс', description: 'RSA, сетевая безопасность, форензика, reverse engineering и CTF.', language: 'python', level: 'advanced', isPublished: true, orderIndex: 8, estimatedHours: 60, createdAt: new Date().toISOString() },
+    { id: 'course-infosec-11', slug: 'infosec-11', title: 'Информационная безопасность 11 класс', description: 'Продвинутая криптография, веб-эксплуатация, бинарная эксплуатация, OSINT и подготовка к CTF.', language: 'python', level: 'advanced', isPublished: true, orderIndex: 9, estimatedHours: 70, createdAt: new Date().toISOString() },
+  );
+
+  // Populate lessons and assignments from seed files
+  addSeedCourse('course-python-10', 'py10', python10Lessons);
+  addSeedCourse('course-cpp-10', 'cpp10', cpp10Lessons);
+  addSeedCourse('course-python-11', 'py11', python11Lessons);
+  addSeedCourse('course-cpp-11', 'cpp11', cpp11Lessons);
+  addSeedCourse('course-infosec-78', 'isec78', infosec78Lessons);
+  addSeedCourse('course-infosec-910', 'isec910', infosec910Lessons);
+  addSeedCourse('course-infosec-11', 'isec11', infosec11Lessons);
+
   console.log(`Seeded: ${db.users.length} users, ${db.courses.length} courses, ${db.lessons.length} lessons, ${db.assignments.length} assignments`);
 }
 
@@ -3575,25 +3651,9 @@ app.post('/api/v1/assignments/:id/submit', authenticateToken, (req: any, res) =>
   res.status(201).json({ success: true, data: submission });
 });
 
-app.get('/api/v1/submissions/:id', authenticateToken, (req: any, res) => {
-  const submission = db.submissions.find(s => s.id === req.params.id);
-  if (!submission) return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Submission not found' } });
-  res.json({ success: true, data: submission });
-});
-
 app.get('/api/v1/submissions/my', authenticateToken, (req: any, res) => {
   const subs = db.submissions.filter(s => s.userId === req.user.id).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   res.json({ success: true, data: subs });
-});
-
-// Teacher: get all submissions for assignment
-app.get('/api/v1/assignments/:assignmentId/submissions', authenticateToken, requireRole('teacher', 'admin'), (req, res) => {
-  const subs = db.submissions.filter(s => s.assignmentId === req.params.assignmentId);
-  const result = subs.map(s => {
-    const user = db.users.find(u => u.id === s.userId);
-    return { ...s, studentName: user ? `${user.firstName} ${user.lastName}` : 'Unknown' };
-  });
-  res.json({ success: true, data: result });
 });
 
 // Teacher: get pending reviews
@@ -3609,6 +3669,23 @@ app.get('/api/v1/submissions/pending-reviews', authenticateToken, requireRole('t
     };
   });
   res.json({ success: true, data: result });
+});
+
+// Teacher: get all submissions for assignment
+app.get('/api/v1/assignments/:assignmentId/submissions', authenticateToken, requireRole('teacher', 'admin'), (req, res) => {
+  const subs = db.submissions.filter(s => s.assignmentId === req.params.assignmentId);
+  const result = subs.map(s => {
+    const user = db.users.find(u => u.id === s.userId);
+    return { ...s, studentName: user ? `${user.firstName} ${user.lastName}` : 'Unknown' };
+  });
+  res.json({ success: true, data: result });
+});
+
+// Must be AFTER /submissions/my and /submissions/pending-reviews
+app.get('/api/v1/submissions/:id', authenticateToken, (req: any, res) => {
+  const submission = db.submissions.find(s => s.id === req.params.id);
+  if (!submission) return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Submission not found' } });
+  res.json({ success: true, data: submission });
 });
 
 // Teacher: review submission
