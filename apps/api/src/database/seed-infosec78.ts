@@ -639,15 +639,15 @@ import hashlib
 
 # MD5 — 128 бит (32 hex-символа)
 text = 'Привет'
-md5_hash = hashlib.md5(text.encode('utf-8')).hexdigest()
+md5_hash = hashlib.md5(text.encode('utf-8')).he\xdigest()
 print(f'MD5: {md5_hash}')  # 32 символа
 
 # SHA-256 — 256 бит (64 hex-символа)
-sha256_hash = hashlib.sha256(text.encode('utf-8')).hexdigest()
+sha256_hash = hashlib.sha256(text.encode('utf-8')).he\xdigest()
 print(f'SHA-256: {sha256_hash}')  # 64 символа
 
 # SHA-1 — 160 бит (40 hex-символов)
-sha1_hash = hashlib.sha1(text.encode('utf-8')).hexdigest()
+sha1_hash = hashlib.sha1(text.encode('utf-8')).he\xdigest()
 print(f'SHA-1: {sha1_hash}')
 \`\`\`
 
@@ -658,7 +658,7 @@ import hashlib
 
 texts = ['Hello', 'hello', 'Hell0']
 for t in texts:
-    h = hashlib.sha256(t.encode()).hexdigest()
+    h = hashlib.sha256(t.encode()).he\xdigest()
     print(f'{t:6s} -> {h[:16]}...')
 # Даже маленькое изменение полностью меняет хеш!
 \`\`\`
@@ -679,7 +679,7 @@ def file_hash(filename):
             if not block:
                 break
             sha256.update(block)
-    return sha256.hexdigest()
+    return sha256.he\xdigest()
 \`\`\`
 
 ### Хранение паролей
@@ -692,7 +692,7 @@ import hashlib
 def hash_password(password, salt='random_salt'):
     """Хеширование пароля с солью."""
     salted = salt + password
-    return hashlib.sha256(salted.encode()).hexdigest()
+    return hashlib.sha256(salted.encode()).he\xdigest()
 
 stored_hash = hash_password('my_password')
 # При авторизации сравниваем хеши
@@ -713,7 +713,7 @@ print(stored_hash == check)  # True
       title: 'Вычисление хеша',
       description: 'На первой строке дано название алгоритма: md5 или sha256. На второй строке — текст. Вычислите хеш текста указанным алгоритмом и выведите его в hex-формате (строчными буквами). Текст кодируйте в UTF-8.',
       difficulty: 'medium',
-      starterCode: 'import hashlib\n\nalgorithm = input()\ntext = input()\n\n# Вычислите хеш и выведите hexdigest\n',
+      starterCode: 'import hashlib\n\nalgorithm = input()\ntext = input()\n\n# Вычислите хеш и выведите he\xdigest\n',
       testCases: [
         { input: 'md5\nhello', expectedOutput: '5d41402abc4b2a76b9719d911017c592', description: 'MD5 от hello' },
         { input: 'sha256\nhello', expectedOutput: '2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824', description: 'SHA-256 от hello' },
@@ -784,19 +784,19 @@ print(bits_to_text(bits)) # Hi
 ## Встраивание данных в пиксели
 
 \`\`\`python
-def embed_bit(pixel_value, bit):
+def embed_bit(pi\xel_value, bit):
     """Заменить младший бит значения пикселя."""
     # Обнуляем младший бит и ставим нужный
-    return (pixel_value & 0xFE) | int(bit)
+    return (pi\xel_value & 0\xFE) | int(bit)
 
 # Пример: встроить бит 1 в значение 200
 original = 200         # 11001000
 modified = embed_bit(200, '1')  # 11001001 = 201
 print(f'{original} -> {modified}')
 
-def extract_bit(pixel_value):
+def extract_bit(pi\xel_value):
     """Извлечь младший бит."""
-    return str(pixel_value & 1)
+    return str(pi\xel_value & 1)
 
 print(extract_bit(201))  # 1
 print(extract_bit(200))  # 0
@@ -804,7 +804,7 @@ print(extract_bit(200))  # 0
 
 ## Ёмкость LSB-стеганографии
 
-Изображение 1920x1080 (Full HD):
+Изображение 1920\x1080 (Full HD):
 - Пикселей: 1920 * 1080 = 2 073 600
 - Каналов: 3 (RGB)
 - Бит для скрытия: 6 220 800
@@ -969,7 +969,7 @@ number = 255
 # Десятичное → другие системы
 print(bin(number))   # 0b11111111
 print(oct(number))   # 0o377
-print(hex(number))   # 0xff
+print(hex(number))   # 0\xff
 
 # Без префиксов
 print(bin(number)[2:])  # 11111111
@@ -1107,7 +1107,7 @@ print(ord('A'))   # 65 (латинская A) — разные символы!
 # UTF-8 кодирование
 text = 'Привет'
 encoded = text.encode('utf-8')
-print(encoded)        # b'\\xd0\\x9f\\xd1\\x80...'
+print(encoded)        # b'\\\xd0\\\x9f\\\xd1\\\x80...'
 print(len(encoded))   # 12 байт (2 байта на символ)
 print(len(text))      # 6 символов
 \`\`\`
@@ -1186,7 +1186,7 @@ print(to_morse('сос'))  # ... --- ...
 \`\`\`python
 # Пример HTTP-запроса (текстовый формат)
 request = """GET /index.html HTTP/1.1
-Host: example.com
+Host: e\xample.com
 User-Agent: Mozilla/5.0
 Accept: text/html
 Cookie: session=abc123
@@ -1266,7 +1266,7 @@ safe_data = {
       difficulty: 'medium',
       starterCode: 'import sys\n\n# Считайте строки HTTP-запроса\n# Выведите: метод, путь, Host\n\nlines = []\nwhile True:\n    line = input()\n    if line == "":\n        break\n    lines.append(line)\n\n# Ваш код здесь\n',
       testCases: [
-        { input: 'GET /index.html HTTP/1.1\nHost: example.com\nUser-Agent: Mozilla/5.0\n', expectedOutput: 'GET\n/index.html\nexample.com', description: 'Простой GET-запрос' },
+        { input: 'GET /index.html HTTP/1.1\nHost: e\xample.com\nUser-Agent: Mozilla/5.0\n', expectedOutput: 'GET\n/index.html\ne\xample.com', description: 'Простой GET-запрос' },
         { input: 'POST /api/login HTTP/1.1\nHost: secure.site\nContent-Type: application/json\n', expectedOutput: 'POST\n/api/login\nsecure.site', description: 'POST-запрос' },
         { input: 'DELETE /users/5 HTTP/2\nHost: api.service.io\n', expectedOutput: 'DELETE\n/users/5\napi.service.io', description: 'DELETE-запрос' },
       ],
@@ -1332,7 +1332,7 @@ sessions = {}
 
 def create_session(user_id):
     """Создать новую сессию."""
-    session_id = hashlib.sha256(os.urandom(32)).hexdigest()
+    session_id = hashlib.sha256(os.urandom(32)).he\xdigest()
     sessions[session_id] = {
         'user_id': user_id,
         'created_at': '2024-01-15 10:30:00',
@@ -1366,7 +1366,7 @@ print(f'Data: {get_session(sid)}')
 # Если cookie передаётся по HTTP — его можно украсть
 stolen_cookie = 'session_id=abc123'  # перехвачено из сети
 
-# 2. Session Fixation (фиксация сессии)
+# 2. Session Fi\xation (фиксация сессии)
 # Атакующий навязывает жертве свой session_id
 
 # 3. XSS + Cookie theft
@@ -1402,7 +1402,7 @@ stolen_cookie = 'session_id=abc123'  # перехвачено из сети
 ## Структура URL
 
 \`\`\`
-https://www.example.com:443/path/page?name=Ivan&age=15#section1
+https://www.e\xample.com:443/path/page?name=Ivan&age=15#section1
 \\_____/ \\_____________/ \\_/ \\_______/ \\_______________/ \\______/
 схема       хост       порт   путь      параметры     якорь
 \`\`\`
@@ -1412,11 +1412,11 @@ https://www.example.com:443/path/page?name=Ivan&age=15#section1
 \`\`\`python
 from urllib.parse import urlparse, parse_qs, urlencode, quote, unquote
 
-url = 'https://example.com/search?q=python+security&page=2&lang=ru'
+url = 'https://e\xample.com/search?q=python+security&page=2&lang=ru'
 
 parsed = urlparse(url)
 print(f'Схема: {parsed.scheme}')       # https
-print(f'Хост: {parsed.hostname}')      # example.com
+print(f'Хост: {parsed.hostname}')      # e\xample.com
 print(f'Путь: {parsed.path}')          # /search
 print(f'Параметры: {parsed.query}')    # q=python+security&page=2&lang=ru
 
@@ -1498,8 +1498,8 @@ print(parse_query_params('name=Ivan&age=15&city=Moscow'))
       difficulty: 'medium',
       starterCode: '# Считайте URL\n# Извлеките параметры из query string\n# Выведите каждый параметр\n\nurl = input()\n\n# Ваш код здесь\n',
       testCases: [
-        { input: 'https://example.com/search?q=python&page=2', expectedOutput: 'q=python\npage=2', description: 'Два параметра' },
-        { input: 'https://example.com/', expectedOutput: 'no params', description: 'Без параметров' },
+        { input: 'https://e\xample.com/search?q=python&page=2', expectedOutput: 'q=python\npage=2', description: 'Два параметра' },
+        { input: 'https://e\xample.com/', expectedOutput: 'no params', description: 'Без параметров' },
         { input: 'https://site.com/api?token=abc123', expectedOutput: 'token=abc123', description: 'Один параметр' },
       ],
       points: 15,
@@ -1580,7 +1580,7 @@ username = input("Логин: ")
 password = input("Пароль: ")
 
 # Знаки ? заменяются безопасно — БД сама экранирует
-cursor.execute(
+cursor.e\xecute(
     "SELECT * FROM users WHERE name=? AND pass=?",
     (username, password)
 )
@@ -1662,7 +1662,7 @@ def escape_html(text):
         '<': '&lt;',
         '>': '&gt;',
         '"': '&quot;',
-        "'": '&#x27;',
+        "'": '&#\x27;',
     }
     for char, escape in replacements.items():
         text = text.replace(char, escape)
@@ -1721,7 +1721,7 @@ payloads = [
     duration: 55,
     assignment: {
       title: 'Экранирование HTML',
-      description: 'На единственной строке дан текст, который может содержать HTML-спецсимволы. Экранируйте следующие символы: & → &amp; < → &lt; > → &gt; " → &quot; \\\' → &#x27; Важно: сначала замените &, затем остальные.',
+      description: 'На единственной строке дан текст, который может содержать HTML-спецсимволы. Экранируйте следующие символы: & → &amp; < → &lt; > → &gt; " → &quot; \\\' → &#\x27; Важно: сначала замените &, затем остальные.',
       difficulty: 'medium',
       starterCode: '# Считайте текст\n# Экранируйте HTML-спецсимволы\n# Выведите результат\n\ntext = input()\n\n# Ваш код здесь\n',
       testCases: [
@@ -1763,14 +1763,14 @@ payloads = [
 
 \`\`\`python
 SIGNATURES = {
-    bytes([0x89, 0x50, 0x4E, 0x47]): 'PNG',
-    bytes([0xFF, 0xD8, 0xFF]): 'JPEG',
-    bytes([0x47, 0x49, 0x46, 0x38]): 'GIF',
-    bytes([0x25, 0x50, 0x44, 0x46]): 'PDF',
-    bytes([0x50, 0x4B, 0x03, 0x04]): 'ZIP',
-    bytes([0x7F, 0x45, 0x4C, 0x46]): 'ELF',
-    bytes([0x4D, 0x5A]): 'EXE',
-    bytes([0x49, 0x44, 0x33]): 'MP3',
+    bytes([0\x89, 0\x50, 0\x4E, 0\x47]): 'PNG',
+    bytes([0\xFF, 0\xD8, 0\xFF]): 'JPEG',
+    bytes([0\x47, 0\x49, 0\x46, 0\x38]): 'GIF',
+    bytes([0\x25, 0\x50, 0\x44, 0\x46]): 'PDF',
+    bytes([0\x50, 0\x4B, 0\x03, 0\x04]): 'ZIP',
+    bytes([0\x7F, 0\x45, 0\x4C, 0\x46]): 'ELF',
+    bytes([0\x4D, 0\x5A]): 'EXE',
+    bytes([0\x49, 0\x44, 0\x33]): 'MP3',
 }
 
 def detect_file_type(filename):
@@ -1788,7 +1788,7 @@ def detect_file_type(filename):
 \`\`\`python
 # Создание байтов из hex
 data = bytes.fromhex('89504e47')
-print(data)        # b'\\x89PNG'
+print(data)        # b'\\\x89PNG'
 print(data.hex())  # 89504e47
 
 # Побайтовый доступ
@@ -1804,7 +1804,7 @@ print(packed.hex())  # 00000780 00000438
 
 # Распаковка
 width, height = struct.unpack('>II', packed)
-print(f'{width}x{height}')  # 1920x1080
+print(f'{width}x{height}')  # 1920\x1080
 \`\`\`
 
 ## Форензика: скрытые файлы
@@ -1817,7 +1817,7 @@ def find_hidden_signatures(filename):
     with open(filename, 'rb') as f:
         data = f.read()
     # Ищем PNG-сигнатуру
-    png_sig = bytes([0x89, 0x50, 0x4E, 0x47])
+    png_sig = bytes([0\x89, 0\x50, 0\x4E, 0\x47])
     offset = data.find(png_sig)
     while offset != -1:
         print(f'PNG найден на смещении {offset} (0x{offset:x})')
@@ -1988,7 +1988,7 @@ import hashlib
 
 def store_password(password):
     """Хеширование пароля для хранения."""
-    return hashlib.sha256(password.encode()).hexdigest()
+    return hashlib.sha256(password.encode()).he\xdigest()
 
 # В базе данных:
 # username: admin
@@ -2008,7 +2008,7 @@ import hashlib
 def dictionary_attack(target_hash, wordlist):
     """Словарная атака — перебор по словарю."""
     for word in wordlist:
-        word_hash = hashlib.sha256(word.encode()).hexdigest()
+        word_hash = hashlib.sha256(word.encode()).he\xdigest()
         if word_hash == target_hash:
             return word
     return None
@@ -2019,7 +2019,7 @@ common_passwords = [
     'welcome', 'monkey', '123456789', '12345678', 'abc123'
 ]
 
-target = hashlib.sha256('admin'.encode()).hexdigest()
+target = hashlib.sha256('admin'.encode()).he\xdigest()
 result = dictionary_attack(target, common_passwords)
 print(f'Пароль найден: {result}')  # admin
 \`\`\`
@@ -2038,7 +2038,7 @@ def brute_force(target_hash, charset, max_length):
     for length in range(1, max_length + 1):
         for combo in itertools.product(charset, repeat=length):
             password = ''.join(combo)
-            if hashlib.sha256(password.encode()).hexdigest() == target_hash:
+            if hashlib.sha256(password.encode()).he\xdigest() == target_hash:
                 return password
     return None
 
@@ -2064,13 +2064,13 @@ import os
 def hash_with_salt(password):
     """Хеширование с солью."""
     salt = os.urandom(16).hex()  # случайная соль
-    salted_hash = hashlib.sha256((salt + password).encode()).hexdigest()
+    salted_hash = hashlib.sha256((salt + password).encode()).he\xdigest()
     return f'{salt}:{salted_hash}'
 
 def verify_password(password, stored):
     """Проверка пароля."""
     salt, expected_hash = stored.split(':')
-    actual_hash = hashlib.sha256((salt + password).encode()).hexdigest()
+    actual_hash = hashlib.sha256((salt + password).encode()).he\xdigest()
     return actual_hash == expected_hash
 
 stored = hash_with_salt('mypassword')
@@ -2148,7 +2148,7 @@ print(f'Шаг 1: {step1}')
 try:
     step2 = base64.b64decode(step1).decode()
     print(f'Шаг 2: {step2}')
-except Exception:
+e\xcept E\xception:
     print('Не Base64, пробуем другое...')
 \`\`\`
 
@@ -2187,7 +2187,7 @@ def solve_ctf_chain(data):
         decoded = base64.b64decode(data).decode('utf-8')
         print(f'Base64 → {decoded}')
         data = decoded
-    except Exception:
+    e\xcept E\xception:
         pass
 
     # Пробуем hex
@@ -2195,7 +2195,7 @@ def solve_ctf_chain(data):
         decoded = bytes.fromhex(data).decode('ascii')
         print(f'Hex → {decoded}')
         data = decoded
-    except Exception:
+    e\xcept E\xception:
         pass
 
     # Пробуем ROT13

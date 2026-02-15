@@ -1,10 +1,13 @@
-FROM gcc:12-alpine
+FROM alpine:3.19
 
 # Create unprivileged user for sandboxing
 RUN adduser -D -u 1000 -h /sandbox sandbox
 
-# Install minimal required packages
+# Install GCC and C++ support
 RUN apk add --no-cache \
+    gcc \
+    g++ \
+    musl-dev \
     libstdc++
 
 # Set working directory
