@@ -5,6 +5,9 @@ import { python10Lessons } from './seed-grade10-python';
 import { cpp10Lessons } from './seed-grade10-cpp';
 import { python11Lessons } from './seed-grade11-python';
 import { cpp11Lessons } from './seed-grade11-cpp';
+import { infosec78Lessons } from './seed-infosec78';
+import { infosec910Lessons } from './seed-infosec910';
+import { infosec11Lessons } from './seed-infosec11';
 
 // ============================================
 // Seed Data for Code Learning Platform
@@ -50,7 +53,10 @@ async function seed() {
         ('python-10-advanced', 'Python для 10 класса', 'Углублённый курс: алгоритмы, структуры данных, рекурсия, ДП, графы. Подготовка к олимпиадам и проектная работа.', 'python', 'advanced', 3, 60, true, $1, 10),
         ('cpp-10-advanced', 'C++ для 10 класса', 'Углублённый курс: указатели, STL, алгоритмы, структуры данных, шаблоны. Подготовка к олимпиадам.', 'cpp', 'advanced', 4, 65, true, $1, 10),
         ('python-11-ege', 'Python для 11 класса (ЕГЭ)', 'Подготовка к ЕГЭ по информатике на Python. Разбор заданий 6, 12, 14, 16, 17, 23-27. Продвинутые алгоритмы.', 'python', 'advanced', 5, 70, true, $1, 11),
-        ('cpp-11-ege', 'C++ для 11 класса (ЕГЭ)', 'Подготовка к ЕГЭ по информатике на C++. Разбор заданий 6, 12, 14, 16, 17, 24-27. Продвинутые алгоритмы.', 'cpp', 'advanced', 6, 70, true, $1, 11)
+        ('cpp-11-ege', 'C++ для 11 класса (ЕГЭ)', 'Подготовка к ЕГЭ по информатике на C++. Разбор заданий 6, 12, 14, 16, 17, 24-27. Продвинутые алгоритмы.', 'cpp', 'advanced', 6, 70, true, $1, 11),
+        ('infosec-78', 'Информационная безопасность 7-8 класс', 'Криптография, стеганография, веб-безопасность и форензика. Олимпиадный уровень для 7-8 классов.', 'python', 'advanced', 7, 50, true, $1, 7),
+        ('infosec-910', 'Информационная безопасность 9-10 класс', 'RSA, сетевая безопасность, форензика, reverse engineering и CTF. Олимпиадный уровень для 9-10 классов.', 'python', 'advanced', 8, 60, true, $1, 9),
+        ('infosec-11', 'Информационная безопасность 11 класс', 'Продвинутая криптография, веб-эксплуатация, бинарная эксплуатация, OSINT и подготовка к CTF.', 'python', 'advanced', 9, 70, true, $1, 11)
       ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title
       RETURNING id, slug`,
       [teacher.id]
@@ -62,8 +68,11 @@ async function seed() {
     const cpp10Course = coursesResult.rows[3];
     const python11Course = coursesResult.rows[4];
     const cpp11Course = coursesResult.rows[5];
+    const infosec78Course = coursesResult.rows[6];
+    const infosec910Course = coursesResult.rows[7];
+    const infosec11Course = coursesResult.rows[8];
 
-    logger.info('Created 6 courses');
+    logger.info('Created 9 courses');
 
     // ============================================
     // 3. PYTHON LESSONS (20)
@@ -2207,6 +2216,24 @@ printArea(r);  // Площадь: 24
     }
     logger.info(`Created ${cpp11Lessons.length} C++ 11 (EGE) lessons`);
 
+    // Insert Infosec 7-8 lessons
+    for (let i = 0; i < infosec78Lessons.length; i++) {
+      await insertLesson(infosec78Course.id, infosec78Lessons[i], i + 1);
+    }
+    logger.info(`Created ${infosec78Lessons.length} Infosec 7-8 lessons`);
+
+    // Insert Infosec 9-10 lessons
+    for (let i = 0; i < infosec910Lessons.length; i++) {
+      await insertLesson(infosec910Course.id, infosec910Lessons[i], i + 1);
+    }
+    logger.info(`Created ${infosec910Lessons.length} Infosec 9-10 lessons`);
+
+    // Insert Infosec 11 lessons
+    for (let i = 0; i < infosec11Lessons.length; i++) {
+      await insertLesson(infosec11Course.id, infosec11Lessons[i], i + 1);
+    }
+    logger.info(`Created ${infosec11Lessons.length} Infosec 11 lessons`);
+
     // ============================================
     // 5. CREATE CLASS AND ENROLL STUDENTS
     // ============================================
@@ -2233,7 +2260,7 @@ printArea(r);  // Площадь: 24
       logger.info(`Created ${classesResult.rows.length} classes and enrolled students`);
 
       // Enroll students in all courses
-      const allCourses = [pythonCourse, cppCourse, python10Course, cpp10Course, python11Course, cpp11Course];
+      const allCourses = [pythonCourse, cppCourse, python10Course, cpp10Course, python11Course, cpp11Course, infosec78Course, infosec910Course, infosec11Course];
       for (const student of students) {
         for (const course of allCourses) {
           await db.query(
@@ -2270,10 +2297,13 @@ printArea(r);  // Площадь: 24
     logger.info('Database seeding completed successfully!');
     logger.info('Summary:');
     logger.info(`  - Users: ${users.length} (1 admin, 1 teacher, ${students.length} students)`);
-    logger.info(`  - Courses: 6 (Python + C++ for grades 7, 10, 11)`);
+    logger.info(`  - Courses: 9 (Python + C++ for grades 7, 10, 11 + Infosec for 7-8, 9-10, 11)`);
     logger.info(`  - 7 grade: ${pythonLessons.length} Python + ${cppLessons.length} C++ lessons`);
     logger.info(`  - 10 grade: ${python10Lessons.length} Python + ${cpp10Lessons.length} C++ lessons`);
     logger.info(`  - 11 grade (EGE): ${python11Lessons.length} Python + ${cpp11Lessons.length} C++ lessons`);
+    logger.info(`  - Infosec 7-8: ${infosec78Lessons.length} lessons`);
+    logger.info(`  - Infosec 9-10: ${infosec910Lessons.length} lessons`);
+    logger.info(`  - Infosec 11: ${infosec11Lessons.length} lessons`);
     logger.info('  - Each lesson has 1 assignment with test cases');
     logger.info('  - Achievements: 12');
     logger.info('');
