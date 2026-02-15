@@ -116,7 +116,7 @@ def cbc_bitflip(ciphertext: bytes, block_size: int,
 
 # Пример: подменяем "role=user" на "role=admin" (допустим role= во 2-м блоке)
 # Модифицируем 1-й блок шифротекста
-modified = cbc_bitflip(ciphertext, 16, b"user\x00", b"admin", target_block=1)
+modified = cbc_bitflip(ciphertext, 16, b"user\\x00", b"admin", target_block=1)
 \`\`\`
 
 ## CVE и реальные примеры
@@ -2129,7 +2129,7 @@ print(f"Shellcode ({len(shellcode)} bytes): {shellcode.hex()}")
 
 ## Null-Free Shellcode
 
-Многие функции (strcpy, gets) останавливаются на \`\\x00\`. Shellcode **не должен содержать нулевых байтов**!
+Многие функции (strcpy, gets) останавливаются на \`\\\x00\`. Shellcode **не должен содержать нулевых байтов**!
 
 \`\`\`python
 def check_null_free(shellcode: bytes) -> dict:
@@ -2700,7 +2700,7 @@ def carve_files(disk_image: bytes, signatures: dict = None) -> list:
             "PNG": (b"\x89PNG\r\n\x1a\n", b"IEND"),
             "PDF": (b"%PDF", b"%%EOF"),
             "ZIP": (b"PK\x03\x04", b"PK\x05\x06"),
-            "GIF": (b"GIF89a", b"\x00\x3b"),
+            "GIF": (b"GIF89a", b"\\x00\x3b"),
         }
 
     found_files = []
