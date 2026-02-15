@@ -515,16 +515,16 @@ def oracle_attack_last_byte(cipher_block, prev_block, oracle_func, block_size):
 import hashlib
 
 # MD5 (устаревший, НЕ безопасен!)
-h = hashlib.md5(b"password").he\xdigest()
+h = hashlib.md5(b"password").hexdigest()
 print(f"MD5: {h}")  # 5f4dcc3b5aa765d61d8327deb882cf99
 
 # SHA-256 (современный стандарт)
-h = hashlib.sha256(b"password").he\xdigest()
+h = hashlib.sha256(b"password").hexdigest()
 print(f"SHA-256: {h}")
 
 # Лавинный эффект
-h1 = hashlib.sha256(b"test1").he\xdigest()
-h2 = hashlib.sha256(b"test2").he\xdigest()
+h1 = hashlib.sha256(b"test1").hexdigest()
+h2 = hashlib.sha256(b"test2").hexdigest()
 # Отличается 1 символ — хеши полностью разные!
 \\\`\\\`\\\`
 
@@ -541,11 +541,11 @@ dictionary = ["password", "123456", "qwerty", "admin", "letmein"]
 # Предвычисление хешей
 hash_table = {}
 for pwd in dictionary:
-    h = hashlib.sha256(pwd.encode()).he\xdigest()
+    h = hashlib.sha256(pwd.encode()).hexdigest()
     hash_table[h] = pwd
 
 # Взлом
-target_hash = hashlib.sha256(b"admin").he\xdigest()
+target_hash = hashlib.sha256(b"admin").hexdigest()
 if target_hash in hash_table:
     print(f"Пароль найден: {hash_table[target_hash]}")
 \\\`\\\`\\\`
@@ -573,7 +573,7 @@ def build_chain(start, chain_len):
     """Построение одной цепочки"""
     current = start
     for i in range(chain_len):
-        h = hashlib.md5(current.encode()).he\xdigest()
+        h = hashlib.md5(current.encode()).hexdigest()
         current = reduction(h, i)
     return current  # конечная точка
 
@@ -592,13 +592,13 @@ import os
 
 def hash_password(password):
     salt = os.urandom(16)  # 16 случайных байт
-    h = hashlib.sha256(salt + password.encode()).he\xdigest()
+    h = hashlib.sha256(salt + password.encode()).hexdigest()
     return salt.hex() + ":" + h
 
 def verify_password(password, stored):
     salt_hex, hash_hex = stored.split(":")
     salt = bytes.fromhex(salt_hex)
-    h = hashlib.sha256(salt + password.encode()).he\xdigest()
+    h = hashlib.sha256(salt + password.encode()).hexdigest()
     return h == hash_hex
 \\\`\\\`\\\`
 
@@ -611,7 +611,7 @@ def verify_password(password, stored):
     duration: 50,
     assignment: {
       title: 'Атака по словарю',
-      description: 'На первой строке дан SHA-256 хеш (hex-строка). На второй строке число N. Далее N строк — словарь паролей. Найдите пароль, SHA-256 хеш которого совпадает с заданным. Выведите найденный пароль или "NOT FOUND". Используйте hashlib.sha256(password.encode()).he\xdigest().',
+      description: 'На первой строке дан SHA-256 хеш (hex-строка). На второй строке число N. Далее N строк — словарь паролей. Найдите пароль, SHA-256 хеш которого совпадает с заданным. Выведите найденный пароль или "NOT FOUND". Используйте hashlib.sha256(password.encode()).hexdigest().',
       difficulty: 'medium' as const,
       starterCode: '# Считайте target_hash\n# Считайте N\n# Считайте N паролей\n# Найдите пароль с совпадающим хешем\n# Выведите пароль или NOT FOUND\n\nimport hashlib\n\n',
       testCases: [
@@ -652,7 +652,7 @@ from math import gcd
 
 def simple_hash(message):
     """Простая хеш-функция для демонстрации"""
-    return int(hashlib.sha256(message.encode()).he\xdigest()[:8], 16)
+    return int(hashlib.sha256(message.encode()).hexdigest()[:8], 16)
 
 # RSA-подпись (упрощённо)
 def rsa_sign(message, private_key):
@@ -899,7 +899,7 @@ def parse_tcp_header(header_bytes):
 . (корень)
 ├── com.
 │   ├── google.com.
-│   └── e\xample.com.
+│   └── example.com.
 ├── org.
 │   └── wikipedia.org.
 └── ru.
@@ -910,11 +910,11 @@ def parse_tcp_header(header_bytes):
 
 | Тип | Назначение | Пример |
 |-----|-----------|--------|
-| A | IPv4 адрес | e\xample.com → 93.184.216.34 |
-| AAAA | IPv6 адрес | e\xample.com → 2606:2800:... |
-| CNAME | Алиас | www.e\xample.com → e\xample.com |
-| MX | Почтовый сервер | e\xample.com → mail.e\xample.com |
-| NS | DNS-сервер | e\xample.com → ns1.e\xample.com |
+| A | IPv4 адрес | example.com → 93.184.216.34 |
+| AAAA | IPv6 адрес | example.com → 2606:2800:... |
+| CNAME | Алиас | www.example.com → example.com |
+| MX | Почтовый сервер | example.com → mail.example.com |
+| NS | DNS-сервер | example.com → ns1.example.com |
 | TXT | Текст | SPF, DKIM записи |
 
 ## Процесс резолвинга
@@ -925,9 +925,9 @@ class DNSResolver:
     def __init__(self):
         self.cache = {}
         self.zone_db = {
-            "e\xample.com": {"A": "93.184.216.34", "MX": "mail.e\xample.com"},
+            "example.com": {"A": "93.184.216.34", "MX": "mail.example.com"},
             "google.com": {"A": "142.250.74.46"},
-            "mail.e\xample.com": {"A": "93.184.216.35"},
+            "mail.example.com": {"A": "93.184.216.35"},
         }
 
     def resolve(self, domain, record_type="A"):
@@ -945,8 +945,8 @@ class DNSResolver:
         return "NXDOMAIN"
 
 resolver = DNSResolver()
-print(resolver.resolve("e\xample.com"))      # 93.184.216.34
-print(resolver.resolve("e\xample.com"))      # [CACHE] 93.184.216.34
+print(resolver.resolve("example.com"))      # 93.184.216.34
+print(resolver.resolve("example.com"))      # [CACHE] 93.184.216.34
 print(resolver.resolve("unknown.com"))      # NXDOMAIN
 \\\`\\\`\\\`
 
@@ -1012,11 +1012,11 @@ print(f"Декодировано: {decoded}")
     duration: 55,
     assignment: {
       title: 'DNS-резолвер с кешем',
-      description: 'На первой строке число N — количество записей в зоне. Далее N строк формата "domain type value" (например: "e\xample.com A 1.2.3.4"). Затем число Q — количество запросов. Далее Q строк формата "domain type". Для каждого запроса выведите результат. Если запись найдена — выведите значение. При повторном запросе того же domain+type — выведите "CACHE:значение". Если не найдена — "NXDOMAIN".',
+      description: 'На первой строке число N — количество записей в зоне. Далее N строк формата "domain type value" (например: "example.com A 1.2.3.4"). Затем число Q — количество запросов. Далее Q строк формата "domain type". Для каждого запроса выведите результат. Если запись найдена — выведите значение. При повторном запросе того же domain+type — выведите "CACHE:значение". Если не найдена — "NXDOMAIN".',
       difficulty: 'medium' as const,
       starterCode: '# Считайте N записей зоны\n# Считайте Q запросов\n# Реализуйте резолвер с кешем\n\n',
       testCases: [
-        { input: '3\ne\xample.com A 93.184.216.34\ngoogle.com A 142.250.74.46\ne\xample.com MX mail.e\xample.com\n4\ne\xample.com A\ngoogle.com A\ne\xample.com A\nunknown.com A', expectedOutput: '93.184.216.34\n142.250.74.46\nCACHE:93.184.216.34\nNXDOMAIN', description: 'Базовый тест с кешем' },
+        { input: '3\nexample.com A 93.184.216.34\ngoogle.com A 142.250.74.46\nexample.com MX mail.example.com\n4\nexample.com A\ngoogle.com A\nexample.com A\nunknown.com A', expectedOutput: '93.184.216.34\n142.250.74.46\nCACHE:93.184.216.34\nNXDOMAIN', description: 'Базовый тест с кешем' },
         { input: '1\ntest.ru A 10.0.0.1\n3\ntest.ru A\ntest.ru MX\ntest.ru A', expectedOutput: '10.0.0.1\nNXDOMAIN\nCACHE:10.0.0.1', description: 'Запрос несуществующего типа записи' },
         { input: '2\na.com A 1.1.1.1\nb.com A 2.2.2.2\n5\na.com A\nb.com A\na.com A\nb.com A\nc.com A', expectedOutput: '1.1.1.1\n2.2.2.2\nCACHE:1.1.1.1\nCACHE:2.2.2.2\nNXDOMAIN', description: 'Множественное кеширование' },
       ],
@@ -1439,7 +1439,7 @@ print(f"Перехвачено: {stripper.intercepted}")
 \\\`\\\`\\\`python
 import struct
 
-# Целые числа в памяти (little-endian, \x86)
+# Целые числа в памяти (little-endian, x86)
 value = 0\x12345678
 packed = struct.pack('<I', value)  # little-endian unsigned int
 print(f"Значение: 0x{value:08X}")
@@ -1685,7 +1685,7 @@ def carve_with_footer(raw_data, header_sig, footer_sig):
 
 В форензике метаданные — **кладезь информации** для расследования.
 
-## EXIF (E\xchangeable Image File Format)
+## EXIF (Exchangeable Image File Format)
 
 Метаданные фотографий: камера, настройки, GPS-координаты.
 
@@ -1884,7 +1884,7 @@ def build_timeline(events):
     return timeline
 
 events = [
-    {'time': '2024-03-15T14:30:00', 'action': 'CREATED', 'file': 'malware.e\xe'},
+    {'time': '2024-03-15T14:30:00', 'action': 'CREATED', 'file': 'malware.exe'},
     {'time': '2024-03-15T14:25:00', 'action': 'MODIFIED', 'file': 'hosts'},
     {'time': '2024-03-15T14:35:00', 'action': 'CREATED', 'file': 'backdoor.py'},
     {'time': '2024-03-15T14:20:00', 'action': 'ACCESSED', 'file': 'credentials.txt'},
@@ -1953,7 +1953,7 @@ def correlate_events(timeline, window_seconds=60):
       difficulty: 'hard' as const,
       starterCode: '# Считайте N файлов\n# Проверьте аномалии\n# Постройте timeline\n\nfrom datetime import datetime\n\n',
       testCases: [
-        { input: '2\nmalware.e\xe 2024-01-10T08:00:00 2024-03-15T14:30:00 2024-03-01T12:00:00\nnotes.txt 2024-03-10T09:00:00 2024-03-15T10:00:00 2024-03-05T08:00:00', expectedOutput: 'malware.e\xe TIMESTOMP M<C\n08:00:00 MODIFIED malware.e\xe\n08:00:00 CREATED notes.txt\n09:00:00 MODIFIED notes.txt\n10:00:00 ACCESSED notes.txt\n12:00:00 CREATED malware.e\xe\n14:30:00 ACCESSED malware.e\xe', description: 'Один файл с timestomping + timeline' },
+        { input: '2\nmalware.exe 2024-01-10T08:00:00 2024-03-15T14:30:00 2024-03-01T12:00:00\nnotes.txt 2024-03-10T09:00:00 2024-03-15T10:00:00 2024-03-05T08:00:00', expectedOutput: 'malware.exe TIMESTOMP M<C\n08:00:00 MODIFIED malware.exe\n08:00:00 CREATED notes.txt\n09:00:00 MODIFIED notes.txt\n10:00:00 ACCESSED notes.txt\n12:00:00 CREATED malware.exe\n14:30:00 ACCESSED malware.exe', description: 'Один файл с timestomping + timeline' },
         { input: '1\ntest.txt 2024-05-01T10:00:00 2024-05-01T11:00:00 2024-05-01T09:00:00', expectedOutput: '09:00:00 CREATED test.txt\n10:00:00 MODIFIED test.txt\n11:00:00 ACCESSED test.txt', description: 'Нормальный файл без аномалий' },
         { input: '1\nhidden.dat 2024-01-01T00:00:00 2024-01-01T00:00:00 2024-06-15T12:00:00', expectedOutput: 'hidden.dat TIMESTOMP M<C\nhidden.dat TIMESTOMP A<C\n00:00:00 MODIFIED hidden.dat\n00:00:00 ACCESSED hidden.dat\n12:00:00 CREATED hidden.dat', description: 'Обе аномалии: M<C и A<C' },
       ],
@@ -1962,19 +1962,19 @@ def correlate_events(timeline, window_seconds=60):
   },
 
   // ──────────────────────────────────────────
-  // УРОК 16: Основы ассемблера \x86
+  // УРОК 16: Основы ассемблера x86
   // ──────────────────────────────────────────
   {
-    slug: 'assembly-\x86-basics',
-    title: 'Основы ассемблера \x86',
+    slug: 'assembly-x86-basics',
+    title: 'Основы ассемблера x86',
     description: 'Регистры, команды MOV/ADD/SUB/CMP/JMP, стек',
-    content: `# Основы ассемблера \x86
+    content: `# Основы ассемблера x86
 
 ## Зачем нужен ассемблер?
 
 Для **reverse engineering** необходимо понимать машинный код. Ассемблер — «человекочитаемый» машинный код.
 
-## Регистры \x86 (32-bit)
+## Регистры x86 (32-bit)
 
 | Регистр | Назначение | 16-bit | 8-bit |
 |---------|-----------|--------|-------|
@@ -1991,7 +1991,7 @@ def correlate_events(timeline, window_seconds=60):
 ## Основные команды
 
 \\\`\\\`\\\`python
-# Эмулятор \x86 (упрощённый)
+# Эмулятор x86 (упрощённый)
 class X86Emulator:
     def __init__(self):
         self.regs = {
@@ -2104,7 +2104,7 @@ ret               ; Возврат
 \\\`\\\`\\\``,
     duration: 60,
     assignment: {
-      title: 'Эмулятор \x86',
+      title: 'Эмулятор x86',
       description: 'На первой строке число N — количество инструкций. Далее N строк — инструкции: "MOV reg val", "ADD reg val", "SUB reg val", "PUSH reg", "POP reg". val — число или имя регистра (eax, ebx, ecx, edx). Стек начинается с ESP=4096, растёт вниз (PUSH: ESP-=4, POP: ESP+=4). После выполнения всех инструкций выведите значения регистров "eax ebx ecx edx esp".',
       difficulty: 'hard' as const,
       starterCode: '# Считайте N инструкций\n# Реализуйте эмулятор\n# Выведите eax ebx ecx edx esp\n\n',
@@ -2175,7 +2175,7 @@ def extract_interesting_strings(data, min_len=4):
             category = "URL"
         elif "@" in s and "." in s:
             category = "EMAIL"
-        elif s.endswith(".dll") or s.endswith(".e\xe"):
+        elif s.endswith(".dll") or s.endswith(".exe"):
             category = "LIBRARY"
         elif any(c in s for c in ['\\\\', '/', 'C:']):
             category = "PATH"
@@ -2253,12 +2253,12 @@ print(f"Случайные: {calculate_entropy(random_data):.2f}")  # ~8.0
     duration: 55,
     assignment: {
       title: 'Анализ строк бинарника',
-      description: 'На первой строке дана последовательность байт в hex через пробел. Извлеките все ASCII-строки (коды 32-126) длиной >= 4. Классифицируйте каждую: если содержит "://" — URL, если содержит ".dll" или ".e\xe" — LIBRARY, если содержит "@" — EMAIL, иначе — STRING. Выведите каждую строку в формате "CATEGORY: string". Если строк нет — "NO STRINGS".',
+      description: 'На первой строке дана последовательность байт в hex через пробел. Извлеките все ASCII-строки (коды 32-126) длиной >= 4. Классифицируйте каждую: если содержит "://" — URL, если содержит ".dll" или ".exe" — LIBRARY, если содержит "@" — EMAIL, иначе — STRING. Выведите каждую строку в формате "CATEGORY: string". Если строк нет — "NO STRINGS".',
       difficulty: 'medium' as const,
       starterCode: '# Считайте hex-байты\n# Извлеките и классифицируйте строки\n\n',
       testCases: [
         { input: '68 74 74 70 3A 2F 2F 65 76 69 6C 2E 63 6F 6D 00 6B 65 72 6E 65 6C 33 32 2E 64 6C 6C 00 48 65 6C 6C 6F', expectedOutput: 'URL: http://evil.com\nLIBRARY: kernel32.dll\nSTRING: Hello', description: 'URL, DLL и обычная строка' },
-        { input: '75 73 65 72 40 6D 61 69 6C 2E 72 75 00 00 74 65 73 74 2E 65 78 65', expectedOutput: 'EMAIL: user@mail.ru\nLIBRARY: test.e\xe', description: 'Email и EXE' },
+        { input: '75 73 65 72 40 6D 61 69 6C 2E 72 75 00 00 74 65 73 74 2E 65 78 65', expectedOutput: 'EMAIL: user@mail.ru\nLIBRARY: test.exe', description: 'Email и EXE' },
         { input: '00 01 02 FF FE FD 00 41 42 43 00', expectedOutput: 'NO STRINGS', description: 'Нет строк >= 4 символов' },
       ],
       points: 15,
@@ -2308,7 +2308,7 @@ class Debugger:
             return None
         instr = self.program[self.pc]
         self.history.append((self.pc, instr, dict(self.regs)))
-        self._e\xecute(instr)
+        self._execute(instr)
         self.pc += 1
         return instr
 
@@ -2320,7 +2320,7 @@ class Debugger:
             self.step()
         return "Program finished"
 
-    def _e\xecute(self, instr):
+    def _execute(self, instr):
         parts = instr.split()
         op = parts[0].upper()
         if op == 'MOV':
@@ -2335,7 +2335,7 @@ class Debugger:
     def _val(self, operand):
         try:
             return int(operand)
-        e\xcept ValueError:
+        except ValueError:
             return self.regs.get(operand, 0)
 \\\`\\\`\\\`
 
@@ -2401,27 +2401,27 @@ def detect_debugger():
         'IsDebuggerPresent': False,  # Win API
         'timing_check': False,       # Замер времени
         'int3_check': False,         # Breakpoint-инструкция
-        'parent_process': 'explorer.e\xe',  # Родительский процесс
+        'parent_process': 'explorer.exe',  # Родительский процесс
     }
     # Если время выполнения участка > N — отладчик
-    # Если родитель не explorer.e\xe — подозрительно
+    # Если родитель не explorer.exe — подозрительно
     return any([
         checks['IsDebuggerPresent'],
         checks['timing_check'],
-        checks['parent_process'] not in ['explorer.e\xe', 'cmd.e\xe'],
+        checks['parent_process'] not in ['explorer.exe', 'cmd.exe'],
     ])
 \\\`\\\`\\\`
 
 ## Инструменты отладки
 
 - **GDB** — стандартный отладчик Linux
-- **\x64dbg** — отладчик для Windows
+- **x64dbg** — отладчик для Windows
 - **OllyDbg** — классический 32-bit отладчик
 - **WinDbg** — отладчик от Microsoft`,
     duration: 55,
     assignment: {
       title: 'Эмулятор с breakpoints',
-      description: 'На первой строке число B — количество breakpoints (номера строк, 0-inde\xed). На второй строке — B чисел (номера строк). На третьей строке — число N (инструкции). Далее N строк — инструкции: MOV/ADD/SUB/MUL reg val. Выполняйте программу. При достижении breakpoint выведите "BREAK line=L eax=X ebx=Y ecx=Z edx=W" и продолжайте. После завершения — "END eax=X ebx=Y ecx=Z edx=W".',
+      description: 'На первой строке число B — количество breakpoints (номера строк, 0-indexed). На второй строке — B чисел (номера строк). На третьей строке — число N (инструкции). Далее N строк — инструкции: MOV/ADD/SUB/MUL reg val. Выполняйте программу. При достижении breakpoint выведите "BREAK line=L eax=X ebx=Y ecx=Z edx=W" и продолжайте. После завершения — "END eax=X ebx=Y ecx=Z edx=W".',
       difficulty: 'hard' as const,
       starterCode: '# Считайте breakpoints\n# Считайте инструкции\n# Эмулируйте с breakpoints\n\n',
       testCases: [
@@ -2515,7 +2515,7 @@ def check_encodings(data):
         decoded = base64.b64decode(data).decode('utf-8')
         if 'flag' in decoded.lower():
             results.append(('base64', decoded))
-    e\xcept E\xception:
+    except Exception:
         pass
 
     # Hex
@@ -2523,7 +2523,7 @@ def check_encodings(data):
         decoded = bytes.fromhex(data).decode('utf-8')
         if 'flag' in decoded.lower():
             results.append(('hex', decoded))
-    e\xcept E\xception:
+    except Exception:
         pass
 
     # ROT13
@@ -2687,7 +2687,7 @@ import hashlib
 def crack_hash(target_hash, wordlist):
     """Взлом хеша по словарю"""
     for word in wordlist:
-        if hashlib.md5(word.encode()).he\xdigest() == target_hash:
+        if hashlib.md5(word.encode()).hexdigest() == target_hash:
             return word
     return None
 
@@ -2723,7 +2723,7 @@ def multi_decode(data):
             steps.append(('base64', result))
             current = result
             decoded = True
-        e\xcept E\xception:
+        except Exception:
             pass
 
         # Попытка Hex
@@ -2733,7 +2733,7 @@ def multi_decode(data):
                 steps.append(('hex', result))
                 current = result
                 decoded = True
-            e\xcept E\xception:
+            except Exception:
                 pass
 
         # Попытка ROT13
