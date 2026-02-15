@@ -7,7 +7,7 @@ export class AuthController {
   /**
    * POST /api/v1/auth/register
    */
-  static async register(req: Request, res: Response, next: NextFunction) {
+  static async register(req: Request, res: Response, _next: NextFunction) {
     try {
       const dto: CreateUserDto = req.body;
 
@@ -52,7 +52,7 @@ export class AuthController {
   /**
    * POST /api/v1/auth/login
    */
-  static async login(req: Request, res: Response, next: NextFunction) {
+  static async login(req: Request, res: Response, _next: NextFunction) {
     try {
       const credentials: LoginCredentials = req.body;
 
@@ -96,7 +96,7 @@ export class AuthController {
   /**
    * POST /api/v1/auth/logout
    */
-  static async logout(req: Request, res: Response, next: NextFunction) {
+  static async logout(req: Request, res: Response, _next: NextFunction) {
     try {
       const { refreshToken } = req.body;
 
@@ -131,7 +131,7 @@ export class AuthController {
   /**
    * POST /api/v1/auth/refresh
    */
-  static async refresh(req: Request, res: Response, next: NextFunction) {
+  static async refresh(req: Request, res: Response, _next: NextFunction) {
     try {
       const { refreshToken } = req.body;
 
@@ -166,7 +166,7 @@ export class AuthController {
   /**
    * GET /api/v1/auth/me
    */
-  static async getMe(req: Request, res: Response, next: NextFunction) {
+  static async getMe(req: Request, res: Response, _next: NextFunction) {
     try {
       // User is already attached by auth middleware
       const user = (req as any).user;

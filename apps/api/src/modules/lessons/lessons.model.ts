@@ -5,7 +5,6 @@ import {
   UpdateLessonDto,
   LessonWithProgress,
   UserProgress,
-  LessonStatus,
 } from '@code-platform/shared-types';
 
 export class LessonsModel {

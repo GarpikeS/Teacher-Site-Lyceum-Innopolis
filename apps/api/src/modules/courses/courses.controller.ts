@@ -11,7 +11,6 @@ export class CoursesController {
   static async getAllCourses(req: Request, res: Response) {
     try {
       const user = req.user;
-      const includeUnpublished = user?.role === 'admin' || user?.role === 'teacher';
 
       let courses;
 

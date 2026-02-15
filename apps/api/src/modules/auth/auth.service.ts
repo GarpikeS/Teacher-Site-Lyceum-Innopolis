@@ -206,7 +206,7 @@ export class AuthService {
   /**
    * Verify email (placeholder - implement email verification logic)
    */
-  static async verifyEmail(token: string): Promise<void> {
+  static async verifyEmail(_token: string): Promise<void> {
     // TODO: Implement email verification logic
     throw new Error('Email verification not implemented');
   }
@@ -214,7 +214,7 @@ export class AuthService {
   /**
    * Request password reset (placeholder)
    */
-  static async requestPasswordReset(email: string): Promise<void> {
+  static async requestPasswordReset(_email: string): Promise<void> {
     // TODO: Implement password reset logic
     throw new Error('Password reset not implemented');
   }
@@ -222,7 +222,7 @@ export class AuthService {
   /**
    * Reset password (placeholder)
    */
-  static async resetPassword(token: string, newPassword: string): Promise<void> {
+  static async resetPassword(_token: string, _newPassword: string): Promise<void> {
     // TODO: Implement password reset logic
     throw new Error('Password reset not implemented');
   }

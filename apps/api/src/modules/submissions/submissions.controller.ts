@@ -84,7 +84,7 @@ export class SubmissionsController {
     }
   }
 
-  static async getPendingReviews(req: Request, res: Response) {
+  static async getPendingReviews(_req: Request, res: Response) {
     try {
       const submissions = await SubmissionsService.getPendingReviews();
       res.json({ success: true, data: submissions });

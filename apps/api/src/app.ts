@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { config } from './config/environment';
-import { morganStream, logger } from './utils/logger';
+import { morganStream } from './utils/logger';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.middleware';
 import { apiLimiter } from './middleware/rate-limiter.middleware';
 
@@ -60,7 +60,7 @@ export const createApp = (): Application => {
   // HEALTH CHECK
   // ============================================
 
-  app.get('/health', (req, res) => {
+  app.get('/health', (_req, res) => {
     res.json({
       status: 'healthy',
       timestamp: new Date().toISOString(),
