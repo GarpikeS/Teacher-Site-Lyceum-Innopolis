@@ -57,7 +57,7 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      await authService.register(data);
+      await authService.register(data as any);
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Ошибка регистрации. Попробуйте еще раз.');
