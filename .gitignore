@@ -58,6 +58,9 @@ docker-compose.override.yml
 *.sqlite
 *.sqlite3
 
+# Temp seed files
+_temp_*
+
 # Logs
 logs/
 *.log

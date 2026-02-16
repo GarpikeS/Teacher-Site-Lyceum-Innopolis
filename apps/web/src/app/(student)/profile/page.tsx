@@ -24,6 +24,11 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -163,9 +168,82 @@ export default function ProfilePage() {
           <CardTitle>Безопасность</CardTitle>
         </CardHeader>
         <CardContent>
-          <Button variant="outline" disabled>
-            Сменить пароль (скоро)
-          </Button>
+          {!showPasswordForm ? (
+            <Button variant="outline" onClick={() => setShowPasswordForm(true)}>
+              Сменить пароль
+            </Button>
+          ) : (
+            <div className="space-y-4 max-w-sm">
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-500">Текущий пароль</label>
+                <Input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-500">Новый пароль</label>
+                <Input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-500">Подтвердите новый пароль</label>
+                <Input
+                  type="password"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  disabled={isChangingPassword}
+                  onClick={async () => {
+                    if (newPassword.length < 6) {
+                      setMessage('Новый пароль должен содержать минимум 6 символов');
+                      return;
+                    }
+                    if (newPassword !== confirmNewPassword) {
+                      setMessage('Пароли не совпадают');
+                      return;
+                    }
+                    setIsChangingPassword(true);
+                    setMessage('');
+                    try {
+                      await apiClient.post('/auth/change-password', { currentPassword, newPassword });
+                      setMessage('Пароль успешно изменён');
+                      setShowPasswordForm(false);
+                      setCurrentPassword('');
+                      setNewPassword('');
+                      setConfirmNewPassword('');
+                    } catch (error: any) {
+                      const msg = error.response?.data?.error?.message || error.message || 'Ошибка смены пароля';
+                      setMessage(msg);
+                    } finally {
+                      setIsChangingPassword(false);
+                    }
+                    setTimeout(() => setMessage(''), 5000);
+                  }}
+                >
+                  {isChangingPassword ? 'Сохранение...' : 'Сохранить'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowPasswordForm(false);
+                    setCurrentPassword('');
+                    setNewPassword('');
+                    setConfirmNewPassword('');
+                  }}
+                >
+                  Отмена
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

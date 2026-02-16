@@ -208,6 +208,31 @@ export class AuthService {
   }
 
   /**
+   * Change password for authenticated user
+   */
+  static async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
+    const result = await db.query<{ password_hash: string }>(
+      'SELECT password_hash FROM users WHERE id = $1',
+      [userId]
+    );
+
+    const user = result.rows[0];
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const isValid = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!isValid) {
+      throw new Error('Неверный текущий пароль');
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 10);
+    await db.query('UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2', [newHash, userId]);
+
+    logger.info('Password changed', { userId });
+  }
+
+  /**
    * Verify email (placeholder - implement email verification logic)
    */
   static async verifyEmail(_token: string): Promise<void> {

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from './auth.service';
+import { UsersService } from '../users/users.service';
 import { logger } from '../../utils/logger';
 import { CreateUserDto, LoginCredentials } from '@code-platform/shared-types';
 
@@ -182,6 +183,67 @@ export class AuthController {
         error: {
           code: 'INTERNAL_ERROR',
           message: 'Failed to get current user',
+        },
+      });
+    }
+  }
+
+  /**
+   * POST /api/v1/auth/change-password
+   */
+  static async changePassword(req: Request, res: Response, _next: NextFunction) {
+    try {
+      const userId = (req as any).user.id;
+      const { currentPassword, newPassword } = req.body;
+
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'Текущий и новый пароль обязательны' },
+        });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'Новый пароль должен содержать минимум 6 символов' },
+        });
+      }
+
+      await AuthService.changePassword(userId, currentPassword, newPassword);
+
+      res.json({ success: true, message: 'Пароль успешно изменён' });
+    } catch (error: any) {
+      logger.error('Change password error', { error: error.message });
+      res.status(400).json({
+        success: false,
+        error: { code: 'CHANGE_PASSWORD_ERROR', message: error.message || 'Ошибка смены пароля' },
+      });
+    }
+  }
+
+  /**
+   * PATCH /api/v1/auth/me
+   */
+  static async updateMe(req: Request, res: Response, _next: NextFunction) {
+    try {
+      const userId = (req as any).user.id;
+      const { firstName, lastName } = req.body;
+
+      const user = await UsersService.updateProfile(userId, { firstName, lastName });
+
+      res.json({
+        success: true,
+        data: user,
+      });
+    } catch (error: any) {
+      logger.error('Update profile error', { error: error.message });
+      const status = error.statusCode || 500;
+      res.status(status).json({
+        success: false,
+        error: {
+          code: error.code || 'INTERNAL_ERROR',
+          message: error.message || 'Failed to update profile',
         },
       });
     }

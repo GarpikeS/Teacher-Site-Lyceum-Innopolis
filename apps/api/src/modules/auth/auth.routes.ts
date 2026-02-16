@@ -34,4 +34,16 @@ router.post('/refresh', AuthController.refresh);
  */
 router.get('/me', authenticate, AuthController.getMe);
 
+/**
+ * PATCH /api/v1/auth/me
+ * Update current user profile
+ */
+router.patch('/me', authenticate, AuthController.updateMe);
+
+/**
+ * POST /api/v1/auth/change-password
+ * Change password for authenticated user
+ */
+router.post('/change-password', authenticate, AuthController.changePassword);
+
 export default router;
