@@ -83,21 +83,21 @@ export class ProgressModel {
       `(SELECT
         s.id, 'submission' as type,
         a.title as title,
-        s.created_at as timestamp
+        s.submitted_at as timestamp
        FROM submissions s
        JOIN assignments a ON a.id = s.assignment_id
        WHERE s.user_id = $1
-       ORDER BY s.created_at DESC
+       ORDER BY s.submitted_at DESC
        LIMIT $2)
       UNION ALL
       (SELECT
         up.id, 'lesson_progress' as type,
         l.title as title,
-        up.updated_at as timestamp
+        up.last_accessed_at as timestamp
        FROM user_progress up
        JOIN lessons l ON l.id = up.lesson_id
        WHERE up.user_id = $1
-       ORDER BY up.updated_at DESC
+       ORDER BY up.last_accessed_at DESC
        LIMIT $2)
       ORDER BY timestamp DESC
       LIMIT $2`,

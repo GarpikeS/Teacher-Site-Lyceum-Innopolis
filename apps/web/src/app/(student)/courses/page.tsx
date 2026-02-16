@@ -49,13 +49,13 @@ export default function CoursesPage() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Прогресс:</span>
-                  <span className="font-medium">{course.progressPercentage?.toFixed(0) || 0}%</span>
+                  <span className="font-medium">{Math.round(Number(course.progressPercentage) || 0)}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${course.progressPercentage || 0}%` }} />
+                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${Number(course.progressPercentage) || 0}%` }} />
                 </div>
                 <p className="text-xs text-gray-500">
-                  {course.completedLessons || 0} из {course.totalLessons || 0} уроков завершено
+                  {Number(course.completedLessons) || 0} из {Number(course.totalLessons) || 0} уроков завершено
                 </p>
               </div>
               <Link href={`/courses/${course.id}`}>
