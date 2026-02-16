@@ -38,7 +38,6 @@ async function seed() {
 
     const users = usersResult.rows;
     const teacher = users[0]; // admin has teacher privileges
-    const students: any[] = [];
 
     logger.info(`Created ${users.length} users`);
 
