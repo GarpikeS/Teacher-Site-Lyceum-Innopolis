@@ -33,7 +33,6 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -51,11 +50,6 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const fillTestCredentials = (email: string) => {
-    setValue('email', email);
-    setValue('password', 'password123');
   };
 
   return (
@@ -122,38 +116,6 @@ export default function LoginPage() {
             </div>
           </CardFooter>
         </form>
-      </Card>
-
-      {/* Test credentials block - remove in production */}
-      <Card className="border-dashed border-amber-300 bg-amber-50 dark:bg-amber-950/20">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-amber-800 dark:text-amber-200">
-            Тестовые аккаунты (пароль: password123)
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <button
-            type="button"
-            onClick={() => fillTestCredentials('admin@school.com')}
-            className="w-full text-left text-xs px-3 py-2 rounded-md bg-white dark:bg-gray-800 border hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          >
-            <span className="font-semibold text-red-600">Admin:</span> admin@school.com
-          </button>
-          <button
-            type="button"
-            onClick={() => fillTestCredentials('teacher@school.com')}
-            className="w-full text-left text-xs px-3 py-2 rounded-md bg-white dark:bg-gray-800 border hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          >
-            <span className="font-semibold text-blue-600">Teacher:</span> teacher@school.com
-          </button>
-          <button
-            type="button"
-            onClick={() => fillTestCredentials('student1@school.com')}
-            className="w-full text-left text-xs px-3 py-2 rounded-md bg-white dark:bg-gray-800 border hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          >
-            <span className="font-semibold text-green-600">Student:</span> student1@school.com
-          </button>
-        </CardContent>
       </Card>
     </div>
   );
