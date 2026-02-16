@@ -21,24 +21,24 @@ async function seed() {
     // ============================================
     // 1. USERS
     // ============================================
-    const passwordHash = await bcrypt.hash('password123', 10);
+    const passwordHash = await bcrypt.hash('Bambuk24', 10);
 
     const usersResult = await db.query(
       `INSERT INTO users (email, password_hash, role, first_name, last_name, is_email_verified)
       VALUES
-        ('admin@school.com', $1, 'admin', 'Администратор', 'Системы', true),
-        ('teacher@school.com', $1, 'teacher', 'Иван', 'Петров', true),
-        ('student1@school.com', $1, 'student', 'Алексей', 'Сидоров', true),
-        ('student2@school.com', $1, 'student', 'Мария', 'Козлова', true),
-        ('student3@school.com', $1, 'student', 'Дмитрий', 'Волков', true)
-      ON CONFLICT (email) DO UPDATE SET first_name = EXCLUDED.first_name
+        ('sivaevva@admin.ru', $1, 'admin', 'Владислав', 'Сиваев', true)
+      ON CONFLICT (email) DO UPDATE SET
+        password_hash = EXCLUDED.password_hash,
+        role = EXCLUDED.role,
+        first_name = EXCLUDED.first_name,
+        last_name = EXCLUDED.last_name
       RETURNING id, email, role`,
       [passwordHash]
     );
 
     const users = usersResult.rows;
-    const teacher = users.find((u: any) => u.role === 'teacher');
-    const students = users.filter((u: any) => u.role === 'student');
+    const teacher = users[0]; // admin has teacher privileges
+    const students: any[] = [];
 
     logger.info(`Created ${users.length} users`);
 
@@ -2158,11 +2158,13 @@ printArea(r);  // Площадь: 24
 
       const lessonId = lessonResult.rows[0].id;
 
-      if (lesson.assignment) {
-        const a = lesson.assignment;
+      // Support both single assignment and multiple assignments
+      const assignments = lesson.assignments || (lesson.assignment ? [lesson.assignment] : []);
+      for (let ai = 0; ai < assignments.length; ai++) {
+        const a = assignments[ai];
         await db.query(
           `INSERT INTO assignments (lesson_id, title, description, assignment_type, difficulty, starter_code, test_cases, validation_type, points, order_index, is_published, ege_task_number)
-          VALUES ($1, $2, $3, 'code', $4, $5, $6, 'automatic', $7, 1, true, $8)
+          VALUES ($1, $2, $3, 'code', $4, $5, $6, 'automatic', $7, $8, true, $9)
           ON CONFLICT DO NOTHING`,
           [
             lessonId,
@@ -2172,6 +2174,7 @@ printArea(r);  // Площадь: 24
             a.starterCode,
             JSON.stringify(a.testCases),
             a.points,
+            ai + 1,
             a.egeTaskNumber || null,
           ]
         );
@@ -2237,7 +2240,7 @@ printArea(r);  // Площадь: 24
     // ============================================
     // 5. CREATE CLASS AND ENROLL STUDENTS
     // ============================================
-    if (teacher && students.length > 0) {
+    if (teacher) {
       const classesResult = await db.query(
         `INSERT INTO classes (name, description, teacher_id, academic_year, is_active)
         VALUES
@@ -2248,28 +2251,7 @@ printArea(r);  // Площадь: 24
         RETURNING id`,
         [teacher.id]
       );
-
-      for (const classRow of classesResult.rows) {
-        for (const student of students) {
-          await db.query(
-            `INSERT INTO class_students (class_id, student_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-            [classRow.id, student.id]
-          );
-        }
-      }
-      logger.info(`Created ${classesResult.rows.length} classes and enrolled students`);
-
-      // Enroll students in all courses
-      const allCourses = [pythonCourse, cppCourse, python10Course, cpp10Course, python11Course, cpp11Course, infosec78Course, infosec910Course, infosec11Course];
-      for (const student of students) {
-        for (const course of allCourses) {
-          await db.query(
-            `INSERT INTO course_enrollments (user_id, course_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-            [student.id, course.id]
-          );
-        }
-      }
-      logger.info('Enrolled students in all courses');
+      logger.info(`Created ${classesResult.rows.length} classes`);
     }
 
     // ============================================
@@ -2296,7 +2278,7 @@ printArea(r);  // Площадь: 24
 
     logger.info('Database seeding completed successfully!');
     logger.info('Summary:');
-    logger.info(`  - Users: ${users.length} (1 admin, 1 teacher, ${students.length} students)`);
+    logger.info(`  - Users: ${users.length} (admin/teacher)`);
     logger.info(`  - Courses: 9 (Python + C++ for grades 7, 10, 11 + Infosec for 7-8, 9-10, 11)`);
     logger.info(`  - 7 grade: ${pythonLessons.length} Python + ${cppLessons.length} C++ lessons`);
     logger.info(`  - 10 grade: ${python10Lessons.length} Python + ${cpp10Lessons.length} C++ lessons`);
@@ -2304,15 +2286,10 @@ printArea(r);  // Площадь: 24
     logger.info(`  - Infosec 7-8: ${infosec78Lessons.length} lessons`);
     logger.info(`  - Infosec 9-10: ${infosec910Lessons.length} lessons`);
     logger.info(`  - Infosec 11: ${infosec11Lessons.length} lessons`);
-    logger.info('  - Each lesson has 1 assignment with test cases');
+    logger.info('  - Each lesson has 3-4 assignments with test cases');
     logger.info('  - Achievements: 12');
     logger.info('');
-    logger.info('Test accounts (password: password123):');
-    logger.info('  Admin:   admin@school.com');
-    logger.info('  Teacher: teacher@school.com');
-    logger.info('  Student: student1@school.com');
-    logger.info('  Student: student2@school.com');
-    logger.info('  Student: student3@school.com');
+    logger.info('Account: sivaevva@admin.ru (admin)');
 
   } catch (error) {
     logger.error('Seeding failed', { error });
