@@ -194,11 +194,15 @@ export class AuthService {
     );
 
     // Cache user in Redis for fast access (15 minutes)
-    await redis.set(
-      `user:${user.id}`,
-      JSON.stringify(user),
-      15 * 60 // 15 minutes
-    );
+    try {
+      await redis.set(
+        `user:${user.id}`,
+        JSON.stringify(user),
+        15 * 60 // 15 minutes
+      );
+    } catch (cacheError) {
+      logger.warn('Failed to cache user in Redis', { userId: user.id, error: cacheError });
+    }
 
     return { accessToken, refreshToken };
   }

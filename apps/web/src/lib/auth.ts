@@ -11,7 +11,13 @@ export const authService = {
    * Register a new user
    */
   async register(data: RegisterDto): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>('/auth/register', data);
+    let response;
+    try {
+      response = await apiClient.post<LoginResponse>('/auth/register', data);
+    } catch (error: any) {
+      const message = error.response?.data?.error?.message || error.message || 'Ошибка регистрации';
+      throw new Error(message);
+    }
 
     if (response.success && response.data) {
       apiClient.setTokens(response.data.tokens.accessToken, response.data.tokens.refreshToken);
@@ -25,7 +31,13 @@ export const authService = {
    * Login user
    */
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>('/auth/login', credentials);
+    let response;
+    try {
+      response = await apiClient.post<LoginResponse>('/auth/login', credentials);
+    } catch (error: any) {
+      const message = error.response?.data?.error?.message || error.message || 'Ошибка входа';
+      throw new Error(message);
+    }
 
     if (response.success && response.data) {
       apiClient.setTokens(response.data.tokens.accessToken, response.data.tokens.refreshToken);
