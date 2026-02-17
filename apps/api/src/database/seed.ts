@@ -21,7 +21,11 @@ async function seed() {
     // ============================================
     // 1. USERS
     // ============================================
-    const passwordHash = await bcrypt.hash('Bambuk24', 10);
+    const seedPassword = process.env.SEED_ADMIN_PASSWORD || 'ChangeMe123!';
+    if (!process.env.SEED_ADMIN_PASSWORD) {
+      logger.warn('SEED_ADMIN_PASSWORD not set, using default. Change it in production!');
+    }
+    const passwordHash = await bcrypt.hash(seedPassword, 12);
 
     const usersResult = await db.query(
       `INSERT INTO users (email, password_hash, role, first_name, last_name, is_email_verified)

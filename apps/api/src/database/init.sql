@@ -429,16 +429,8 @@ CREATE TRIGGER update_enrollment_on_progress_change
 -- SEED DATA (Optional - for development)
 -- ============================================
 
--- Insert default admin user (password: admin123)
-INSERT INTO users (email, password_hash, role, first_name, last_name, is_email_verified)
-VALUES (
-  'admin@code-platform.com',
-  '$2a$10$YourHashedPasswordHere',  -- Replace with actual bcrypt hash
-  'admin',
-  'Admin',
-  'User',
-  true
-);
+-- Default admin user is created via db:seed command (npm run db:seed)
+-- Do NOT hardcode passwords in SQL files
 
 -- Insert sample achievements
 INSERT INTO achievements (slug, title, description, badge_color, criteria, points) VALUES

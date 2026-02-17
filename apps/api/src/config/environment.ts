@@ -66,3 +66,14 @@ export const config = {
 export const isDevelopment = config.nodeEnv === 'development';
 export const isProduction = config.nodeEnv === 'production';
 export const isTest = config.nodeEnv === 'test';
+
+// Validate critical secrets in production
+if (isProduction) {
+  const missing: string[] = [];
+  if (!process.env.JWT_SECRET) missing.push('JWT_SECRET');
+  if (!process.env.JWT_REFRESH_SECRET) missing.push('JWT_REFRESH_SECRET');
+  if (!process.env.DATABASE_URL) missing.push('DATABASE_URL');
+  if (missing.length > 0) {
+    throw new Error(`Missing required environment variables for production: ${missing.join(', ')}`);
+  }
+}

@@ -113,7 +113,8 @@ services:
       - executor_logs:/app/logs
     networks:
       - code-platform-network
-    privileged: true
+    # Note: privileged mode is a security risk. Use Docker socket mount only.
+    # privileged: true
     restart: unless-stopped
 
   # ============================================
