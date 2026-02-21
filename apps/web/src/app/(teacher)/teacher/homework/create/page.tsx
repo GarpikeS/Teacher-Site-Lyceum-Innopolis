@@ -6,6 +6,21 @@ import { apiClient } from '@/lib/api-client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  ArrowLeft,
+  BookOpen,
+  FileText,
+  Code2,
+  FlaskConical,
+  Plus,
+  Trash2,
+  Loader2,
+  AlertCircle,
+  GraduationCap,
+  Calendar,
+  Star,
+  Terminal,
+} from 'lucide-react';
 
 interface ClassItem {
   id: string;
@@ -102,39 +117,78 @@ export default function CreateHomeworkPage() {
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">Создать домашнее задание</h1>
+    <div className="space-y-6 animate-fade-in">
+      {/* Back button */}
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-1.5 text-slate-400 hover:text-emerald-600 text-sm font-medium transition-colors group"
+      >
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+        Назад к списку ДЗ
+      </button>
+
+      {/* Header */}
+      <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 shadow-soft">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm">
+            <BookOpen className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-white">Создать домашнее задание</h1>
+            <p className="text-emerald-100 text-sm mt-0.5">Заполните информацию о задании и тест-кейсы</p>
+          </div>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Error */}
         {error && (
-          <div className="bg-red-50 text-red-700 p-3 rounded text-sm">{error}</div>
+          <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm animate-slide-up">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            {error}
+          </div>
         )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Основная информация</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        {/* Main info */}
+        <div className="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden animate-slide-up">
+          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 px-6 py-4 border-b border-indigo-100">
+            <h3 className="font-semibold text-indigo-800 flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Основная информация
+            </h3>
+          </div>
+          <div className="p-6 space-y-4">
             <div>
-              <label className="text-sm font-medium block mb-1">Название ДЗ</label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Домашнее задание #1" required />
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Название ДЗ</label>
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Домашнее задание #1"
+                required
+                className="rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-400"
+              />
             </div>
             <div>
-              <label className="text-sm font-medium block mb-1">Описание (необязательно)</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Описание (необязательно)</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Дополнительные указания для учеников..."
-                className="w-full border rounded p-2 text-sm min-h-[80px]"
+                className="w-full border border-slate-200 rounded-xl p-3 text-sm min-h-[80px] focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none transition-all resize-none"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium block mb-1">Класс</label>
+                <label className="text-sm font-medium text-slate-700 mb-1.5 block">
+                  <span className="flex items-center gap-1.5">
+                    <GraduationCap className="w-3.5 h-3.5 text-slate-400" />
+                    Класс
+                  </span>
+                </label>
                 <select
                   value={classId}
                   onChange={(e) => setClassId(e.target.value)}
-                  className="w-full border rounded p-2 text-sm"
+                  className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none transition-all bg-white"
                   required
                 >
                   {classes.map((c) => (
@@ -143,119 +197,213 @@ export default function CreateHomeworkPage() {
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium block mb-1">Дедлайн (необязательно)</label>
-                <Input type="datetime-local" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
+                <label className="text-sm font-medium text-slate-700 mb-1.5 block">
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    Дедлайн (необязательно)
+                  </span>
+                </label>
+                <Input
+                  type="datetime-local"
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
+                  className="rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-400"
+                />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Задание</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        {/* Assignment */}
+        <div className="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden animate-slide-up" style={{ animationDelay: '100ms' }}>
+          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-4 border-b border-emerald-100">
+            <h3 className="font-semibold text-emerald-800 flex items-center gap-2">
+              <Code2 className="w-4 h-4" />
+              Задание
+            </h3>
+          </div>
+          <div className="p-6 space-y-4">
             <div>
-              <label className="text-sm font-medium block mb-1">Название задания</label>
-              <Input value={assignmentTitle} onChange={(e) => setAssignmentTitle(e.target.value)} placeholder="Вычисление суммы" required />
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Название задания</label>
+              <Input
+                value={assignmentTitle}
+                onChange={(e) => setAssignmentTitle(e.target.value)}
+                placeholder="Вычисление суммы"
+                required
+                className="rounded-xl border-slate-200 focus:border-emerald-400 focus:ring-emerald-400"
+              />
             </div>
             <div>
-              <label className="text-sm font-medium block mb-1">Условие задания</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Условие задания</label>
               <textarea
                 value={assignmentDescription}
                 onChange={(e) => setAssignmentDescription(e.target.value)}
                 placeholder="Напишите программу, которая..."
-                className="w-full border rounded p-2 text-sm min-h-[100px]"
+                className="w-full border border-slate-200 rounded-xl p-3 text-sm min-h-[100px] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 outline-none transition-all resize-none"
                 required
               />
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="text-sm font-medium block mb-1">Сложность</label>
-                <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as any)} className="w-full border rounded p-2 text-sm">
+                <label className="text-sm font-medium text-slate-700 mb-1.5 block">
+                  <span className="flex items-center gap-1.5">
+                    <Star className="w-3.5 h-3.5 text-slate-400" />
+                    Сложность
+                  </span>
+                </label>
+                <select
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value as any)}
+                  className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 outline-none transition-all bg-white"
+                >
                   <option value="easy">Легко (10 б.)</option>
                   <option value="medium">Средне (15 б.)</option>
                   <option value="hard">Сложно (25 б.)</option>
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium block mb-1">Язык</label>
-                <select value={language} onChange={(e) => setLanguage(e.target.value as any)} className="w-full border rounded p-2 text-sm">
+                <label className="text-sm font-medium text-slate-700 mb-1.5 block">
+                  <span className="flex items-center gap-1.5">
+                    <Terminal className="w-3.5 h-3.5 text-slate-400" />
+                    Язык
+                  </span>
+                </label>
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value as any)}
+                  className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 outline-none transition-all bg-white"
+                >
                   <option value="python">Python</option>
                   <option value="cpp">C++</option>
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium block mb-1">Баллы</label>
-                <Input type="number" value={points} onChange={(e) => setPoints(Number(e.target.value))} min={1} max={100} />
+                <label className="text-sm font-medium text-slate-700 mb-1.5 block">Баллы</label>
+                <Input
+                  type="number"
+                  value={points}
+                  onChange={(e) => setPoints(Number(e.target.value))}
+                  min={1}
+                  max={100}
+                  className="rounded-xl border-slate-200 focus:border-emerald-400 focus:ring-emerald-400"
+                />
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium block mb-1">Начальный код (необязательно)</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Начальный код (необязательно)</label>
               <textarea
                 value={starterCode}
                 onChange={(e) => setStarterCode(e.target.value)}
                 placeholder="# Ваш код..."
-                className="w-full border rounded p-2 text-sm font-mono min-h-[80px] bg-gray-50"
+                className="w-full border border-slate-200 rounded-xl p-3 text-sm font-mono min-h-[80px] bg-slate-50 focus:bg-white focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 outline-none transition-all resize-none"
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
+        {/* Test Cases */}
+        <div className="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden animate-slide-up" style={{ animationDelay: '200ms' }}>
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 px-6 py-4 border-b border-amber-100">
             <div className="flex justify-between items-center">
-              <CardTitle>Тест-кейсы</CardTitle>
-              <Button type="button" onClick={addTestCase} variant="outline" size="sm">
+              <h3 className="font-semibold text-amber-800 flex items-center gap-2">
+                <FlaskConical className="w-4 h-4" />
+                Тест-кейсы
+              </h3>
+              <Button
+                type="button"
+                onClick={addTestCase}
+                variant="outline"
+                size="sm"
+                className="rounded-xl border-amber-200 text-amber-700 hover:bg-amber-100 hover:border-amber-300 transition-all"
+              >
+                <Plus className="w-3.5 h-3.5 mr-1" />
                 Добавить тест
               </Button>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+          </div>
+          <div className="p-6 space-y-4">
             {testCases.map((tc, i) => (
-              <div key={i} className="border rounded p-3 space-y-2">
+              <div
+                key={i}
+                className="border border-slate-200 rounded-xl p-4 space-y-3 hover:border-slate-300 transition-colors bg-slate-50/50"
+              >
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Тест #{i + 1}</span>
+                  <span className="text-sm font-semibold text-slate-600 flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-bold">
+                      {i + 1}
+                    </span>
+                    Тест #{i + 1}
+                  </span>
                   {testCases.length > 1 && (
-                    <button type="button" onClick={() => removeTestCase(i)} className="text-red-500 text-sm hover:underline">
+                    <button
+                      type="button"
+                      onClick={() => removeTestCase(i)}
+                      className="flex items-center gap-1 text-red-400 text-sm hover:text-red-600 transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
                       Удалить
                     </button>
                   )}
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500">Описание</label>
-                  <Input value={tc.description} onChange={(e) => updateTestCase(i, 'description', e.target.value)} placeholder="Базовый тест" />
+                  <label className="text-xs font-medium text-slate-500 mb-1 block">Описание</label>
+                  <Input
+                    value={tc.description}
+                    onChange={(e) => updateTestCase(i, 'description', e.target.value)}
+                    placeholder="Базовый тест"
+                    className="rounded-xl border-slate-200 focus:border-amber-400 focus:ring-amber-400"
+                  />
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-gray-500">Входные данные (stdin)</label>
+                    <label className="text-xs font-medium text-slate-500 mb-1 block">Входные данные (stdin)</label>
                     <textarea
                       value={tc.input}
                       onChange={(e) => updateTestCase(i, 'input', e.target.value)}
                       placeholder="5\n3"
-                      className="w-full border rounded p-2 text-sm font-mono min-h-[60px]"
+                      className="w-full border border-slate-200 rounded-xl p-2.5 text-sm font-mono min-h-[60px] bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all resize-none"
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500">Ожидаемый вывод</label>
+                    <label className="text-xs font-medium text-slate-500 mb-1 block">Ожидаемый вывод</label>
                     <textarea
                       value={tc.expectedOutput}
                       onChange={(e) => updateTestCase(i, 'expectedOutput', e.target.value)}
                       placeholder="8"
-                      className="w-full border rounded p-2 text-sm font-mono min-h-[60px]"
+                      className="w-full border border-slate-200 rounded-xl p-2.5 text-sm font-mono min-h-[60px] bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all resize-none"
                     />
                   </div>
                 </div>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <div className="flex gap-4">
-          <Button type="submit" disabled={isLoading} className="flex-1">
-            {isLoading ? 'Создание...' : 'Создать домашнее задание'}
+        {/* Submit */}
+        <div className="flex gap-4 animate-slide-up" style={{ animationDelay: '300ms' }}>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="flex-1 bg-emerald-600 hover:bg-emerald-700 rounded-xl h-12 font-medium text-base"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Создание...
+              </>
+            ) : (
+              <>
+                <Plus className="w-5 h-5 mr-2" />
+                Создать домашнее задание
+              </>
+            )}
           </Button>
-          <Button type="button" variant="outline" onClick={() => router.back()}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.back()}
+            className="rounded-xl h-12 px-6 border-slate-200 hover:bg-slate-50"
+          >
             Отмена
           </Button>
         </div>

@@ -9,14 +9,7 @@ import { z } from 'zod';
 import { authService } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Mail, Lock, User, AlertCircle } from 'lucide-react';
 
 const registerSchema = z
   .object({
@@ -62,116 +55,115 @@ export default function RegisterPage() {
   };
 
   return (
-    <Card>
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">Регистрация</CardTitle>
-        <CardDescription className="text-center">
-          Создайте аккаунт для доступа к платформе
-        </CardDescription>
-      </CardHeader>
+    <div>
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-slate-900">Создать аккаунт</h2>
+        <p className="text-sm text-slate-500 mt-1">Зарегистрируйтесь для доступа к платформе</p>
+      </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4">
-          {error && (
-            <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
-              {error}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {error && (
+          <div className="flex items-center gap-2 bg-red-50 text-red-600 text-sm p-3 rounded-xl border border-red-100">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            {error}
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <label htmlFor="firstName" className="text-sm font-medium text-slate-700">Имя</label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input
+                id="firstName"
+                type="text"
+                placeholder="Иван"
+                className="pl-10 h-11 rounded-xl"
+                {...register('firstName')}
+                disabled={isLoading}
+              />
             </div>
-          )}
-
-          <div className="space-y-2">
-            <label htmlFor="firstName" className="text-sm font-medium">
-              Имя
-            </label>
-            <Input
-              id="firstName"
-              type="text"
-              placeholder="Иван"
-              {...register('firstName')}
-              disabled={isLoading}
-            />
-            {errors.firstName && (
-              <p className="text-sm text-destructive">{errors.firstName.message}</p>
-            )}
+            {errors.firstName && <p className="text-xs text-red-500">{errors.firstName.message}</p>}
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="lastName" className="text-sm font-medium">
-              Фамилия
-            </label>
+          <div className="space-y-1.5">
+            <label htmlFor="lastName" className="text-sm font-medium text-slate-700">Фамилия</label>
             <Input
               id="lastName"
               type="text"
               placeholder="Иванов"
+              className="h-11 rounded-xl"
               {...register('lastName')}
               disabled={isLoading}
             />
-            {errors.lastName && (
-              <p className="text-sm text-destructive">{errors.lastName.message}</p>
-            )}
+            {errors.lastName && <p className="text-xs text-red-500">{errors.lastName.message}</p>}
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
+        <div className="space-y-1.5">
+          <label htmlFor="email" className="text-sm font-medium text-slate-700">Email</label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input
               id="email"
               type="email"
               placeholder="student@example.com"
+              className="pl-10 h-11 rounded-xl"
               {...register('email')}
               disabled={isLoading}
             />
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
-            )}
           </div>
+          {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+        </div>
 
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium">
-              Пароль
-            </label>
+        <div className="space-y-1.5">
+          <label htmlFor="password" className="text-sm font-medium text-slate-700">Пароль</label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input
               id="password"
               type="password"
               placeholder="••••••••"
+              className="pl-10 h-11 rounded-xl"
               {...register('password')}
               disabled={isLoading}
             />
-            {errors.password && (
-              <p className="text-sm text-destructive">{errors.password.message}</p>
-            )}
           </div>
+          {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
+        </div>
 
-          <div className="space-y-2">
-            <label htmlFor="confirmPassword" className="text-sm font-medium">
-              Подтвердите пароль
-            </label>
+        <div className="space-y-1.5">
+          <label htmlFor="confirmPassword" className="text-sm font-medium text-slate-700">Подтвердите пароль</label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input
               id="confirmPassword"
               type="password"
               placeholder="••••••••"
+              className="pl-10 h-11 rounded-xl"
               {...register('confirmPassword')}
               disabled={isLoading}
             />
-            {errors.confirmPassword && (
-              <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
-            )}
           </div>
-        </CardContent>
+          {errors.confirmPassword && <p className="text-xs text-red-500">{errors.confirmPassword.message}</p>}
+        </div>
 
-        <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
-          </Button>
+        <Button type="submit" className="w-full h-11 rounded-xl text-sm font-medium" disabled={isLoading}>
+          {isLoading ? (
+            <span className="flex items-center gap-2">
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Регистрация...
+            </span>
+          ) : 'Зарегистрироваться'}
+        </Button>
 
-          <div className="text-sm text-center text-muted-foreground">
-            Уже есть аккаунт?{' '}
-            <Link href="/login" className="text-primary hover:underline">
-              Войти
-            </Link>
-          </div>
-        </CardFooter>
+        <p className="text-sm text-center text-slate-500">
+          Уже есть аккаунт?{' '}
+          <Link href="/login" className="text-indigo-600 font-medium hover:underline">
+            Войти
+          </Link>
+        </p>
       </form>
-    </Card>
+    </div>
   );
 }

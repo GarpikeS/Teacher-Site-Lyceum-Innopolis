@@ -6,6 +6,19 @@ import { apiClient } from '@/lib/api-client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  ArrowLeft,
+  GraduationCap,
+  UserPlus,
+  Mail,
+  BookOpen,
+  FileText,
+  CheckCircle2,
+  Users,
+  AlertCircle,
+  Loader2,
+  Inbox,
+} from 'lucide-react';
 
 interface StudentInfo {
   id: string;
@@ -73,79 +86,189 @@ export default function ClassDetailPage() {
     }
   };
 
-  if (isLoading) return <div className="p-8">Загрузка...</div>;
-  if (!classData) return <div className="p-8">Класс не найден</div>;
+  if (isLoading) {
+    return (
+      <div className="space-y-6 animate-fade-in">
+        <div className="h-5 w-32 bg-slate-100 rounded animate-pulse" />
+        <div className="h-20 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl animate-pulse" />
+        <div className="bg-white rounded-2xl shadow-soft border border-slate-100 p-6 space-y-4">
+          <div className="h-6 w-40 bg-slate-100 rounded-lg animate-pulse" />
+          <div className="flex gap-3">
+            <div className="h-10 flex-1 bg-slate-50 rounded-xl animate-pulse" />
+            <div className="h-10 w-28 bg-slate-100 rounded-xl animate-pulse" />
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl shadow-soft border border-slate-100 p-6 space-y-4">
+          <div className="h-6 w-32 bg-slate-100 rounded-lg animate-pulse" />
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-12 bg-slate-50 rounded-lg animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!classData) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 animate-fade-in">
+        <div className="p-4 bg-red-50 rounded-full mb-4">
+          <AlertCircle className="w-8 h-8 text-red-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-slate-700">Класс не найден</h3>
+        <p className="text-slate-400 text-sm mt-1">Возможно, он был удален или у вас нет доступа</p>
+        <Button
+          onClick={() => router.back()}
+          variant="outline"
+          className="mt-4 rounded-xl"
+        >
+          <ArrowLeft className="w-4 h-4 mr-1.5" />
+          Назад
+        </Button>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <button onClick={() => router.back()} className="text-blue-600 hover:underline text-sm">
-        &larr; Назад к классам
+    <div className="space-y-6 animate-fade-in">
+      {/* Back button */}
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-1.5 text-slate-400 hover:text-emerald-600 text-sm font-medium transition-colors group"
+      >
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+        Назад к классам
       </button>
 
-      <div>
-        <h1 className="text-3xl font-bold">{classData.name}</h1>
-        {classData.description && (
-          <p className="text-gray-600 mt-1">{classData.description}</p>
-        )}
+      {/* Header */}
+      <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 shadow-soft">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm">
+            <GraduationCap className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-white">{classData.name}</h1>
+            {classData.description && (
+              <p className="text-emerald-100 text-sm mt-0.5">{classData.description}</p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Add Student */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Добавить ученика</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden animate-slide-up">
+        <div className="bg-gradient-to-r from-indigo-50 to-blue-50 px-6 py-4 border-b border-indigo-100">
+          <h3 className="font-semibold text-indigo-800 flex items-center gap-2">
+            <UserPlus className="w-4 h-4" />
+            Добавить ученика
+          </h3>
+        </div>
+        <div className="p-6">
           <form onSubmit={handleAddStudent} className="flex gap-3 items-end">
             <div className="flex-1">
-              <label className="text-sm font-medium">Email ученика</label>
-              <Input
-                type="email"
-                value={studentEmail}
-                onChange={(e) => setStudentEmail(e.target.value)}
-                placeholder="student@school.ru"
-                required
-              />
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Email ученика</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Input
+                  type="email"
+                  value={studentEmail}
+                  onChange={(e) => setStudentEmail(e.target.value)}
+                  placeholder="student@school.ru"
+                  required
+                  className="pl-10 rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-400"
+                />
+              </div>
             </div>
-            <Button type="submit" disabled={isAdding}>
-              {isAdding ? 'Добавление...' : 'Добавить'}
+            <Button
+              type="submit"
+              disabled={isAdding}
+              className="bg-indigo-600 hover:bg-indigo-700 rounded-xl px-5"
+            >
+              {isAdding ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  <UserPlus className="w-4 h-4 mr-1.5" />
+                  Добавить
+                </>
+              )}
             </Button>
           </form>
-          {addError && <p className="text-sm text-red-600 mt-2">{addError}</p>}
-        </CardContent>
-      </Card>
+          {addError && (
+            <div className="flex items-center gap-2 mt-3 text-sm text-red-600 bg-red-50 rounded-xl px-3 py-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              {addError}
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Students List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Ученики ({classData.students.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden animate-slide-up" style={{ animationDelay: '100ms' }}>
+        <div className="px-6 py-4 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <Users className="w-5 h-5 text-slate-400" />
+            <h3 className="text-lg font-semibold text-slate-800">
+              Ученики
+            </h3>
+            <span className="text-sm font-medium text-slate-400 bg-slate-100 px-2.5 py-0.5 rounded-full">
+              {classData.students.length}
+            </span>
+          </div>
+        </div>
+        <div className="p-6 pt-0">
           {classData.students.length === 0 ? (
-            <p className="text-gray-500 text-sm">В классе пока нет учеников</p>
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="p-4 bg-slate-50 rounded-full mb-4">
+                <Inbox className="w-8 h-8 text-slate-300" />
+              </div>
+              <p className="text-slate-500 font-medium">В классе пока нет учеников</p>
+              <p className="text-slate-400 text-sm mt-1">Добавьте учеников по email выше</p>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b text-left">
-                    <th className="pb-2 font-medium">Ученик</th>
-                    <th className="pb-2 font-medium">Email</th>
-                    <th className="pb-2 font-medium text-center">Курсов</th>
-                    <th className="pb-2 font-medium text-center">Уроков</th>
-                    <th className="pb-2 font-medium text-center">Работ</th>
-                    <th className="pb-2 font-medium text-center">Принято</th>
+                  <tr className="text-left">
+                    <th className="py-3 px-2 font-medium text-slate-400 text-xs uppercase tracking-wider">Ученик</th>
+                    <th className="py-3 px-2 font-medium text-slate-400 text-xs uppercase tracking-wider">Email</th>
+                    <th className="py-3 px-2 font-medium text-slate-400 text-xs uppercase tracking-wider text-center">
+                      <span className="flex items-center justify-center gap-1">
+                        <BookOpen className="w-3.5 h-3.5" /> Курсов
+                      </span>
+                    </th>
+                    <th className="py-3 px-2 font-medium text-slate-400 text-xs uppercase tracking-wider text-center">
+                      <span className="flex items-center justify-center gap-1">
+                        <FileText className="w-3.5 h-3.5" /> Уроков
+                      </span>
+                    </th>
+                    <th className="py-3 px-2 font-medium text-slate-400 text-xs uppercase tracking-wider text-center">Работ</th>
+                    <th className="py-3 px-2 font-medium text-slate-400 text-xs uppercase tracking-wider text-center">
+                      <span className="flex items-center justify-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Принято
+                      </span>
+                    </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-slate-50">
                   {classData.students.map((student) => (
-                    <tr key={student.id} className="border-b last:border-0">
-                      <td className="py-3 font-medium">{student.firstName} {student.lastName}</td>
-                      <td className="py-3 text-gray-500">{student.email}</td>
-                      <td className="py-3 text-center">{student.enrolledCourses}</td>
-                      <td className="py-3 text-center">{student.completedLessons}</td>
-                      <td className="py-3 text-center">{student.totalSubmissions}</td>
-                      <td className="py-3 text-center">
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          student.passedSubmissions > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    <tr key={student.id} className="group hover:bg-slate-50/50 transition-colors">
+                      <td className="py-3.5 px-2">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-xs font-bold">
+                            {student.firstName[0]}{student.lastName[0]}
+                          </div>
+                          <span className="font-medium text-slate-700">{student.firstName} {student.lastName}</span>
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-2 text-slate-400">{student.email}</td>
+                      <td className="py-3.5 px-2 text-center text-slate-600">{student.enrolledCourses}</td>
+                      <td className="py-3.5 px-2 text-center text-slate-600">{student.completedLessons}</td>
+                      <td className="py-3.5 px-2 text-center text-slate-600">{student.totalSubmissions}</td>
+                      <td className="py-3.5 px-2 text-center">
+                        <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                          student.passedSubmissions > 0
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'bg-slate-50 text-slate-500 border border-slate-200'
                         }`}>
                           {student.passedSubmissions}
                         </span>
@@ -156,8 +279,8 @@ export default function ClassDetailPage() {
               </table>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

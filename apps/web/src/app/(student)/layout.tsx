@@ -5,15 +5,26 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { authService } from '@/lib/auth';
 import { User } from '@code-platform/shared-types';
-import { Button } from '@/components/ui/button';
+import {
+  LayoutDashboard,
+  BookOpen,
+  ClipboardList,
+  Trophy,
+  Bell,
+  UserCircle,
+  LogOut,
+  Code2,
+  Menu,
+  X,
+} from 'lucide-react';
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard' },
-  { href: '/courses', label: 'Курсы' },
-  { href: '/homework', label: 'ДЗ' },
-  { href: '/achievements', label: 'Достижения' },
-  { href: '/notifications', label: 'Уведомления' },
-  { href: '/profile', label: 'Профиль' },
+  { href: '/dashboard', label: 'Главная', icon: LayoutDashboard },
+  { href: '/courses', label: 'Курсы', icon: BookOpen },
+  { href: '/homework', label: 'Домашние задания', icon: ClipboardList },
+  { href: '/achievements', label: 'Достижения', icon: Trophy },
+  { href: '/notifications', label: 'Уведомления', icon: Bell },
+  { href: '/profile', label: 'Профиль', icon: UserCircle },
 ];
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
@@ -21,6 +32,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -35,41 +47,116 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     checkAuth();
   }, [router]);
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center">Загрузка...</div>;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+          <span className="text-sm text-muted-foreground">Загрузка...</span>
+        </div>
+      </div>
+    );
+  }
+
+  const isActive = (href: string) =>
+    pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex gap-6 items-center">
-              <h1 className="text-2xl font-bold">Code Platform</h1>
-              <nav className="hidden md:flex gap-1">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`px-3 py-2 rounded text-sm transition-colors ${
-                      pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
-                        ? 'bg-blue-50 text-blue-700 font-medium'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </nav>
+    <div className="min-h-screen bg-slate-50">
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`fixed top-0 left-0 z-50 h-full w-64 gradient-sidebar text-white transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex flex-col h-full">
+          {/* Logo */}
+          <div className="flex items-center gap-3 px-6 py-5 border-b border-white/10">
+            <div className="w-9 h-9 rounded-lg bg-indigo-500 flex items-center justify-center">
+              <Code2 className="w-5 h-5 text-white" />
             </div>
-            <div className="flex gap-4 items-center">
-              <span className="text-sm text-gray-600">{user?.firstName} {user?.lastName}</span>
-              <Button onClick={() => { authService.logout(); router.push('/login'); }} variant="outline" size="sm">
-                Выйти
-              </Button>
+            <span className="font-bold text-lg">CodePlatform</span>
+            <button className="ml-auto lg:hidden" onClick={() => setSidebarOpen(false)}>
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* User info */}
+          <div className="px-6 py-4 border-b border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-sm font-bold">
+                {user?.firstName?.[0]}{user?.lastName?.[0]}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-medium truncate">{user?.firstName} {user?.lastName}</p>
+                <p className="text-xs text-slate-400 truncate">{user?.email}</p>
+              </div>
             </div>
           </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setSidebarOpen(false)}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+                    active
+                      ? 'bg-white/15 text-white font-medium shadow-sm'
+                      : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  <Icon className={`w-5 h-5 flex-shrink-0 ${active ? 'text-indigo-300' : ''}`} />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Logout */}
+          <div className="px-3 py-4 border-t border-white/10">
+            <button
+              onClick={() => { authService.logout(); router.push('/login'); }}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-white/10 hover:text-white transition-colors w-full"
+            >
+              <LogOut className="w-5 h-5" />
+              Выйти
+            </button>
+          </div>
         </div>
-      </header>
-      <main>{children}</main>
+      </aside>
+
+      {/* Main content */}
+      <div className="lg:pl-64">
+        {/* Top bar */}
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200/60">
+          <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
+            <div className="flex items-center gap-3">
+              <button className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-slate-100" onClick={() => setSidebarOpen(true)}>
+                <Menu className="w-5 h-5 text-slate-600" />
+              </button>
+              <h2 className="text-lg font-semibold text-slate-800">
+                {navItems.find(item => isActive(item.href))?.label || 'Главная'}
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link href="/notifications" className="p-2 rounded-lg hover:bg-slate-100 relative">
+                <Bell className="w-5 h-5 text-slate-500" />
+              </Link>
+            </div>
+          </div>
+        </header>
+
+        {/* Page content */}
+        <main className="p-4 sm:p-6 lg:p-8 animate-fade-in">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
