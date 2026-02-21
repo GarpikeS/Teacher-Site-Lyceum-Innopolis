@@ -23,9 +23,6 @@ const registerSchema = z
     email: z.string().email('Неверный формат email'),
     firstName: z.string().min(2, 'Имя должно содержать минимум 2 символа'),
     lastName: z.string().min(2, 'Фамилия должна содержать минимум 2 символа'),
-    role: z.enum(['student', 'teacher'], {
-      required_error: 'Выберите роль',
-    }),
     password: z.string().min(6, 'Пароль должен содержать минимум 6 символов'),
     confirmPassword: z.string(),
   })
@@ -47,9 +44,7 @@ export default function RegisterPage() {
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    defaultValues: {
-      role: 'student',
-    },
+    defaultValues: {},
   });
 
   const onSubmit = async (data: RegisterFormData) => {
@@ -112,24 +107,6 @@ export default function RegisterPage() {
             />
             {errors.lastName && (
               <p className="text-sm text-destructive">{errors.lastName.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="role" className="text-sm font-medium">
-              Роль
-            </label>
-            <select
-              id="role"
-              {...register('role')}
-              disabled={isLoading}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="student">Ученик</option>
-              <option value="teacher">Учитель</option>
-            </select>
-            {errors.role && (
-              <p className="text-sm text-destructive">{errors.role.message}</p>
             )}
           </div>
 

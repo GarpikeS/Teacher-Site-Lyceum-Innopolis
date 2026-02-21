@@ -24,3 +24,6 @@ export * from './class.types';
 
 // Audit types
 export * from './audit.types';
+
+// Homework types
+export * from './homework.types';

@@ -92,6 +92,7 @@ interface Assignment {
   points: number;
   orderIndex: number;
   isPublished: boolean;
+  egeTaskNumber?: number | null;
 }
 
 interface Submission {
@@ -3246,10 +3247,10 @@ int main() {
         prerequisites: [],
         createdAt: new Date().toISOString(),
       });
-      if (lesson.assignment) {
-        const a = lesson.assignment;
+      const assignmentList = (lesson as any).assignments || ((lesson as any).assignment ? [(lesson as any).assignment] : []);
+      assignmentList.forEach((a: any, ai: number) => {
         db.assignments.push({
-          id: `assign-${prefix}-${idx + 1}`,
+          id: `assign-${prefix}-${idx + 1}-${ai + 1}`,
           lessonId,
           title: a.title,
           description: a.description,
@@ -3267,10 +3268,11 @@ int main() {
           validationType: 'automatic',
           maxAttempts: 10,
           points: a.points || 10,
-          orderIndex: 1,
+          orderIndex: ai + 1,
           isPublished: true,
+          egeTaskNumber: a.egeTaskNumber || null,
         });
-      }
+      });
     });
   }
 

@@ -38,7 +38,7 @@ export class AuthService {
                  avatar_url as "avatarUrl", is_active as "isActive",
                  is_email_verified as "isEmailVerified", created_at as "createdAt",
                  updated_at as "updatedAt"`,
-      [dto.email, passwordHash, dto.role || UserRole.STUDENT, dto.firstName, dto.lastName]
+      [dto.email, passwordHash, UserRole.STUDENT, dto.firstName, dto.lastName]
     );
 
     const user = result.rows[0];

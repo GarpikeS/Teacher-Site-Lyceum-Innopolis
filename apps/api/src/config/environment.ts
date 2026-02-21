@@ -47,7 +47,7 @@ export const config = {
   },
 
   // Code Executor
-  executorUrl: process.env.EXECUTOR_URL || 'http://localhost:3002',
+  executorUrl: process.env.EXECUTOR_URL || 'http://localhost:5012',
 
   // Docker Sandbox Limits
   sandbox: {

@@ -20,6 +20,7 @@ import achievementsRoutes from './modules/achievements/achievements.routes';
 import notificationsRoutes from './modules/notifications/notifications.routes';
 import usersRoutes from './modules/users/users.routes';
 import teacherRoutes from './modules/teacher/teacher.routes';
+import homeworkRoutes from './modules/homework/homework.routes';
 
 export const createApp = (): Application => {
   const app = express();
@@ -90,6 +91,7 @@ export const createApp = (): Application => {
   app.use('/api/v1/notifications', notificationsRoutes);
   app.use('/api/v1/users', usersRoutes);
   app.use('/api/v1/teacher', teacherRoutes);
+  app.use('/api/v1/homework', homeworkRoutes);
 
   // ============================================
   // ERROR HANDLING

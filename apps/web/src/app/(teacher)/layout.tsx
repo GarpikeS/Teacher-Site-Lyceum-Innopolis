@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 const navItems = [
   { href: '/teacher/dashboard', label: 'Dashboard' },
   { href: '/teacher/classes', label: 'Классы' },
+  { href: '/teacher/homework', label: 'Домашние задания' },
   { href: '/teacher/reviews', label: 'Проверка работ' },
 ];
 
