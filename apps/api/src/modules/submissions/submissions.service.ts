@@ -79,7 +79,11 @@ export class SubmissionsService {
         body: JSON.stringify({
           code: dto.code,
           language: dto.language,
-          testCases: assignment.testCases || [],
+          testCases: (assignment.testCases || []).map((tc: any, i: number) => ({
+            id: tc.id ?? i + 1,
+            input: tc.input ?? '',
+            expectedOutput: tc.expectedOutput,
+          })),
         }),
       });
 
