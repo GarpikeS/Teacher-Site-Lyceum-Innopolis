@@ -33,7 +33,7 @@ export class TeacherService {
 
       // Recent submissions
       const recentResult = await db.query(
-        `SELECT s.id, s.status, s.score, s.max_score as "maxScore", s.created_at as "submittedAt",
+        `SELECT s.id, s.status, s.score, s.max_score as "maxScore", s.submitted_at as "submittedAt",
                 u.first_name || ' ' || u.last_name as "studentName",
                 a.title as "assignmentTitle"
          FROM submissions s
@@ -41,7 +41,7 @@ export class TeacherService {
          JOIN assignments a ON s.assignment_id = a.id
          JOIN class_students cs ON s.user_id = cs.student_id
          WHERE cs.class_id = ANY($1)
-         ORDER BY s.created_at DESC
+         ORDER BY s.submitted_at DESC
          LIMIT 10`,
         [classIds]
       );

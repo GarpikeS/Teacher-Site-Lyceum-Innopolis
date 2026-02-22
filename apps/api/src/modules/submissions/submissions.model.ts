@@ -7,7 +7,7 @@ const SUBMISSION_COLUMNS = `
   memory_used_mb as "memoryUsedMb", score, max_score as "maxScore",
   teacher_feedback as "teacherFeedback", reviewed_by as "reviewedBy",
   reviewed_at as "reviewedAt", attempt_number as "attemptNumber",
-  created_at as "submittedAt", updated_at as "gradedAt"
+  submitted_at as "submittedAt", graded_at as "gradedAt"
 `;
 
 export class SubmissionsModel {
@@ -33,7 +33,7 @@ export class SubmissionsModel {
     const result = await db.query<Submission>(
       `SELECT ${SUBMISSION_COLUMNS} FROM submissions
        WHERE assignment_id = $1
-       ORDER BY created_at DESC`,
+       ORDER BY submitted_at DESC`,
       [assignmentId]
     );
     return result.rows;
@@ -43,7 +43,7 @@ export class SubmissionsModel {
     const result = await db.query<Submission>(
       `SELECT ${SUBMISSION_COLUMNS} FROM submissions
        WHERE user_id = $1
-       ORDER BY created_at DESC
+       ORDER BY submitted_at DESC
        LIMIT $2`,
       [userId, limit]
     );
@@ -117,7 +117,7 @@ export class SubmissionsModel {
     const result = await db.query<Submission>(
       `SELECT ${SUBMISSION_COLUMNS} FROM submissions
        WHERE status = 'manual_review'
-       ORDER BY created_at ASC`
+       ORDER BY submitted_at ASC`
     );
     return result.rows;
   }
