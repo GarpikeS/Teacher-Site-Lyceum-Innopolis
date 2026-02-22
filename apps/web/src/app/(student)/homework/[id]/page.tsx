@@ -406,7 +406,130 @@ export default function HomeworkDetailPage() {
             </Card>
           )}
 
-          {/* Submission results */}
+        </div>
+
+        {/* Right column: Code editor + terminal + test results */}
+        <div
+          className="space-y-4 animate-slide-up"
+          style={{ animationDelay: '0.1s' }}
+        >
+          <Card className="rounded-2xl border border-slate-100 shadow-soft overflow-hidden">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <FileCode2 className="w-4 h-4 text-indigo-600" />
+                  <CardTitle className="text-lg">Решение</CardTitle>
+                </div>
+                <span className="text-xs font-medium px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600">
+                  {language === 'cpp' ? 'C++' : 'Python'}
+                </span>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {/* Editor */}
+              <div className="rounded-xl overflow-hidden border border-slate-200">
+                {MonacoEditor ? (
+                  <MonacoEditor
+                    height="350px"
+                    language={language === 'cpp' ? 'cpp' : 'python'}
+                    theme="vs-dark"
+                    value={code}
+                    onChange={(val: string | undefined) => setCode(val || '')}
+                    options={{
+                      minimap: { enabled: false },
+                      fontSize: 14,
+                      scrollBeyondLastLine: false,
+                      automaticLayout: true,
+                      padding: { top: 12, bottom: 12 },
+                      borderRadius: 12,
+                    }}
+                  />
+                ) : (
+                  <textarea
+                    className="w-full h-[350px] p-4 font-mono text-sm bg-slate-900 text-slate-100 resize-none focus:outline-none"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    placeholder="Введите код..."
+                  />
+                )}
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-3 mt-4">
+                <Button
+                  onClick={handleRun}
+                  disabled={isRunning || !code.trim()}
+                  variant="outline"
+                  className="flex-1 rounded-xl h-11 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all"
+                >
+                  {isRunning ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Выполняется...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-4 h-4 mr-2" />
+                      Запустить
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting || !code.trim()}
+                  className="flex-1 rounded-xl h-11 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white transition-all"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Проверяется...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4 mr-2" />
+                      Отправить решение
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* Submitting indicator */}
+              {isSubmitting && (
+                <div className="mt-4 flex items-center gap-3 p-3 rounded-xl bg-indigo-50 border border-indigo-100 animate-fade-in">
+                  <div className="relative">
+                    <div className="w-8 h-8 rounded-full border-2 border-indigo-200 border-t-indigo-600 animate-spin" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-indigo-800">
+                      Проверяем ваше решение...
+                    </p>
+                    <p className="text-xs text-indigo-500">
+                      Это может занять до 30 секунд
+                    </p>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Output panel — under editor */}
+          {output && (
+            <Card className="rounded-2xl border border-slate-100 shadow-soft overflow-hidden animate-slide-up">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Terminal className="w-4 h-4 text-slate-500" />
+                  <CardTitle className="text-sm font-semibold text-slate-700">Вывод</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <pre className="bg-slate-900 text-slate-100 p-4 rounded-xl text-sm overflow-auto max-h-48 whitespace-pre-wrap font-mono leading-relaxed">
+                  {output}
+                </pre>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Test results — under terminal */}
           {submissionResult && (
             <Card className="rounded-2xl border border-slate-100 shadow-soft overflow-hidden animate-slide-up">
               {/* Score bar */}
@@ -532,7 +655,7 @@ export default function HomeworkDetailPage() {
                                 <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">
                                   Ожидалось
                                 </p>
-                                <code className="text-xs text-emerald-700 font-mono">
+                                <code className="text-xs text-emerald-700 font-mono whitespace-pre-wrap">
                                   {test.expectedOutput}
                                 </code>
                               </div>
@@ -540,7 +663,7 @@ export default function HomeworkDetailPage() {
                                 <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">
                                   Получено
                                 </p>
-                                <code className="text-xs text-red-700 font-mono">
+                                <code className="text-xs text-red-700 font-mono whitespace-pre-wrap">
                                   {test.actualOutput}
                                 </code>
                               </div>
@@ -554,111 +677,6 @@ export default function HomeworkDetailPage() {
               </CardContent>
             </Card>
           )}
-        </div>
-
-        {/* Right column: Code editor */}
-        <div
-          className="space-y-4 animate-slide-up"
-          style={{ animationDelay: '0.1s' }}
-        >
-          <Card className="rounded-2xl border border-slate-100 shadow-soft overflow-hidden">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <FileCode2 className="w-4 h-4 text-indigo-600" />
-                  <CardTitle className="text-lg">Решение</CardTitle>
-                </div>
-                <span className="text-xs font-medium px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600">
-                  {language === 'cpp' ? 'C++' : 'Python'}
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {/* Editor */}
-              <div className="rounded-xl overflow-hidden border border-slate-200">
-                {MonacoEditor ? (
-                  <MonacoEditor
-                    height="350px"
-                    language={language === 'cpp' ? 'cpp' : 'python'}
-                    theme="vs-dark"
-                    value={code}
-                    onChange={(val: string | undefined) => setCode(val || '')}
-                    options={{
-                      minimap: { enabled: false },
-                      fontSize: 14,
-                      scrollBeyondLastLine: false,
-                      automaticLayout: true,
-                      padding: { top: 12, bottom: 12 },
-                      borderRadius: 12,
-                    }}
-                  />
-                ) : (
-                  <textarea
-                    className="w-full h-[350px] p-4 font-mono text-sm bg-slate-900 text-slate-100 resize-none focus:outline-none"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    placeholder="Введите код..."
-                  />
-                )}
-              </div>
-
-              {/* Action buttons */}
-              <div className="flex gap-3 mt-4">
-                <Button
-                  onClick={handleRun}
-                  disabled={isRunning || !code.trim()}
-                  variant="outline"
-                  className="flex-1 rounded-xl h-11 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all"
-                >
-                  {isRunning ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Выполняется...
-                    </>
-                  ) : (
-                    <>
-                      <Play className="w-4 h-4 mr-2" />
-                      Запустить
-                    </>
-                  )}
-                </Button>
-                <Button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting || !code.trim()}
-                  className="flex-1 rounded-xl h-11 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white transition-all"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Проверяется...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4 mr-2" />
-                      Отправить решение
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              {/* Submitting indicator */}
-              {isSubmitting && (
-                <div className="mt-4 flex items-center gap-3 p-3 rounded-xl bg-indigo-50 border border-indigo-100 animate-fade-in">
-                  <div className="relative">
-                    <div className="w-8 h-8 rounded-full border-2 border-indigo-200 border-t-indigo-600 animate-spin" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-indigo-800">
-                      Проверяем ваше решение...
-                    </p>
-                    <p className="text-xs text-indigo-500">
-                      Это может занять до 30 секунд
-                    </p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

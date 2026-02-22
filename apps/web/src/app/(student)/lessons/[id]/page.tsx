@@ -403,174 +403,9 @@ export default function LessonPage() {
             </Card>
           )}
 
-          {/* Output panel */}
-          {output && (
-            <Card className="rounded-2xl border border-slate-100 shadow-soft overflow-hidden animate-slide-up">
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
-                  <Terminal className="w-4 h-4 text-slate-500" />
-                  <CardTitle className="text-sm font-semibold text-slate-700">Вывод</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <pre className="bg-slate-900 text-slate-100 p-4 rounded-xl text-sm overflow-auto max-h-48 whitespace-pre-wrap font-mono leading-relaxed">
-                  {output}
-                </pre>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Submission results */}
-          {submissionResult && (
-            <Card className="rounded-2xl border border-slate-100 shadow-soft overflow-hidden animate-slide-up">
-              {/* Score bar */}
-              <div
-                className={`h-1 ${
-                  allPassed
-                    ? 'bg-gradient-to-r from-emerald-500 to-green-400'
-                    : 'bg-gradient-to-r from-red-500 to-orange-400'
-                }`}
-              />
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Trophy
-                      className={`w-5 h-5 ${allPassed ? 'text-emerald-600' : 'text-slate-400'}`}
-                    />
-                    <CardTitle className="text-sm font-semibold text-slate-700">
-                      Результаты тестирования
-                    </CardTitle>
-                  </div>
-                  {/* Score badge */}
-                  <div
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl ${
-                      allPassed
-                        ? 'bg-emerald-50 text-emerald-700'
-                        : scorePercentage > 50
-                          ? 'bg-amber-50 text-amber-700'
-                          : 'bg-red-50 text-red-700'
-                    }`}
-                  >
-                    <span className="text-lg font-bold">
-                      {submissionResult.passedTests}/{submissionResult.totalTests}
-                    </span>
-                    <span className="text-xs font-medium">тестов</span>
-                  </div>
-                </div>
-
-                {/* Progress bar */}
-                <div className="mt-3">
-                  <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-700 ease-out ${
-                        allPassed
-                          ? 'bg-gradient-to-r from-emerald-500 to-green-400'
-                          : scorePercentage > 50
-                            ? 'bg-gradient-to-r from-amber-500 to-yellow-400'
-                            : 'bg-gradient-to-r from-red-500 to-orange-400'
-                      }`}
-                      style={{ width: `${scorePercentage}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between mt-1">
-                    <span className="text-xs text-slate-400">0%</span>
-                    <span
-                      className={`text-xs font-semibold ${
-                        allPassed
-                          ? 'text-emerald-600'
-                          : scorePercentage > 50
-                            ? 'text-amber-600'
-                            : 'text-red-600'
-                      }`}
-                    >
-                      {scorePercentage}%
-                    </span>
-                  </div>
-                </div>
-
-                {/* All passed banner */}
-                {allPassed && (
-                  <div className="flex items-center gap-2 mt-3 p-3 rounded-xl bg-emerald-50 border border-emerald-100">
-                    <CheckCircle className="w-5 h-5 text-emerald-600" />
-                    <span className="text-sm font-medium text-emerald-800">
-                      Все тесты пройдены! Отличная работа!
-                    </span>
-                  </div>
-                )}
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {submissionResult.details?.map((test, idx) => (
-                    <div
-                      key={test.testId}
-                      className={`rounded-xl border p-3 transition-all animate-slide-up ${
-                        test.passed
-                          ? 'bg-emerald-50/50 border-emerald-200'
-                          : 'bg-red-50/50 border-red-200'
-                      }`}
-                      style={{ animationDelay: `${idx * 0.05}s` }}
-                    >
-                      <div className="flex items-center gap-2">
-                        {test.passed ? (
-                          <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-                        ) : (
-                          <XCircle className="w-4 h-4 text-red-600 shrink-0" />
-                        )}
-                        <span
-                          className={`text-sm font-medium ${
-                            test.passed ? 'text-emerald-800' : 'text-red-800'
-                          }`}
-                        >
-                          Тест #{test.testId}
-                        </span>
-                        <span
-                          className={`ml-auto text-xs px-2 py-0.5 rounded-md font-medium ${
-                            test.passed
-                              ? 'bg-emerald-100 text-emerald-700'
-                              : 'bg-red-100 text-red-700'
-                          }`}
-                        >
-                          {test.passed ? 'Пройден' : 'Не пройден'}
-                        </span>
-                      </div>
-                      {!test.passed && (
-                        <div className="mt-2 pl-6 space-y-1">
-                          {test.error ? (
-                            <div className="flex items-start gap-1.5">
-                              <AlertTriangle className="w-3 h-3 text-red-500 mt-0.5 shrink-0" />
-                              <p className="text-xs text-red-700 font-mono">{test.error}</p>
-                            </div>
-                          ) : (
-                            <div className="grid grid-cols-2 gap-2">
-                              <div className="rounded-lg bg-white/80 p-2 border border-emerald-100">
-                                <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">
-                                  Ожидалось
-                                </p>
-                                <code className="text-xs text-emerald-700 font-mono">
-                                  {test.expectedOutput}
-                                </code>
-                              </div>
-                              <div className="rounded-lg bg-white/80 p-2 border border-red-100">
-                                <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">
-                                  Получено
-                                </p>
-                                <code className="text-xs text-red-700 font-mono">
-                                  {test.actualOutput}
-                                </code>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
         </div>
 
-        {/* Right column: Code Editor */}
+        {/* Right column: Code Editor + terminal + test results */}
         <div className="space-y-4 animate-slide-up" style={{ animationDelay: '0.1s' }}>
           {selectedAssignment && (
             <Card className="rounded-2xl border border-slate-100 shadow-soft overflow-hidden">
@@ -674,6 +509,168 @@ export default function LessonPage() {
                     </div>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Output panel — under editor */}
+          {output && (
+            <Card className="rounded-2xl border border-slate-100 shadow-soft overflow-hidden animate-slide-up">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <Terminal className="w-4 h-4 text-slate-500" />
+                  <CardTitle className="text-sm font-semibold text-slate-700">Вывод</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <pre className="bg-slate-900 text-slate-100 p-4 rounded-xl text-sm overflow-auto max-h-48 whitespace-pre-wrap font-mono leading-relaxed">
+                  {output}
+                </pre>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Test results — under terminal */}
+          {submissionResult && (
+            <Card className="rounded-2xl border border-slate-100 shadow-soft overflow-hidden animate-slide-up">
+              <div
+                className={`h-1 ${
+                  allPassed
+                    ? 'bg-gradient-to-r from-emerald-500 to-green-400'
+                    : 'bg-gradient-to-r from-red-500 to-orange-400'
+                }`}
+              />
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Trophy
+                      className={`w-5 h-5 ${allPassed ? 'text-emerald-600' : 'text-slate-400'}`}
+                    />
+                    <CardTitle className="text-sm font-semibold text-slate-700">
+                      Результаты тестирования
+                    </CardTitle>
+                  </div>
+                  <div
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl ${
+                      allPassed
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : scorePercentage > 50
+                          ? 'bg-amber-50 text-amber-700'
+                          : 'bg-red-50 text-red-700'
+                    }`}
+                  >
+                    <span className="text-lg font-bold">
+                      {submissionResult.passedTests}/{submissionResult.totalTests}
+                    </span>
+                    <span className="text-xs font-medium">тестов</span>
+                  </div>
+                </div>
+
+                <div className="mt-3">
+                  <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-700 ease-out ${
+                        allPassed
+                          ? 'bg-gradient-to-r from-emerald-500 to-green-400'
+                          : scorePercentage > 50
+                            ? 'bg-gradient-to-r from-amber-500 to-yellow-400'
+                            : 'bg-gradient-to-r from-red-500 to-orange-400'
+                      }`}
+                      style={{ width: `${scorePercentage}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between mt-1">
+                    <span className="text-xs text-slate-400">0%</span>
+                    <span
+                      className={`text-xs font-semibold ${
+                        allPassed
+                          ? 'text-emerald-600'
+                          : scorePercentage > 50
+                            ? 'text-amber-600'
+                            : 'text-red-600'
+                      }`}
+                    >
+                      {scorePercentage}%
+                    </span>
+                  </div>
+                </div>
+
+                {allPassed && (
+                  <div className="flex items-center gap-2 mt-3 p-3 rounded-xl bg-emerald-50 border border-emerald-100">
+                    <CheckCircle className="w-5 h-5 text-emerald-600" />
+                    <span className="text-sm font-medium text-emerald-800">
+                      Все тесты пройдены! Отличная работа!
+                    </span>
+                  </div>
+                )}
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {submissionResult.details?.map((test, idx) => (
+                    <div
+                      key={test.testId}
+                      className={`rounded-xl border p-3 transition-all animate-slide-up ${
+                        test.passed
+                          ? 'bg-emerald-50/50 border-emerald-200'
+                          : 'bg-red-50/50 border-red-200'
+                      }`}
+                      style={{ animationDelay: `${idx * 0.05}s` }}
+                    >
+                      <div className="flex items-center gap-2">
+                        {test.passed ? (
+                          <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                        ) : (
+                          <XCircle className="w-4 h-4 text-red-600 shrink-0" />
+                        )}
+                        <span
+                          className={`text-sm font-medium ${
+                            test.passed ? 'text-emerald-800' : 'text-red-800'
+                          }`}
+                        >
+                          Тест #{test.testId}
+                        </span>
+                        <span
+                          className={`ml-auto text-xs px-2 py-0.5 rounded-md font-medium ${
+                            test.passed
+                              ? 'bg-emerald-100 text-emerald-700'
+                              : 'bg-red-100 text-red-700'
+                          }`}
+                        >
+                          {test.passed ? 'Пройден' : 'Не пройден'}
+                        </span>
+                      </div>
+                      {!test.passed && (
+                        <div className="mt-2 pl-6 space-y-1">
+                          {test.error ? (
+                            <div className="flex items-start gap-1.5">
+                              <AlertTriangle className="w-3 h-3 text-red-500 mt-0.5 shrink-0" />
+                              <p className="text-xs text-red-700 font-mono">{test.error}</p>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="rounded-lg bg-white/80 p-2 border border-emerald-100">
+                                <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">
+                                  Ожидалось
+                                </p>
+                                <code className="text-xs text-emerald-700 font-mono whitespace-pre-wrap">
+                                  {test.expectedOutput}
+                                </code>
+                              </div>
+                              <div className="rounded-lg bg-white/80 p-2 border border-red-100">
+                                <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">
+                                  Получено
+                                </p>
+                                <code className="text-xs text-red-700 font-mono whitespace-pre-wrap">
+                                  {test.actualOutput}
+                                </code>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           )}
