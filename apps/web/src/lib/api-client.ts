@@ -1,7 +1,9 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { ApiResponse } from '@code-platform/shared-types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = typeof window !== 'undefined'
+  ? '' // In browser: use relative URLs (nginx proxies /api/ to the API server)
+  : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5011');
 
 class ApiClient {
   private client: AxiosInstance;

@@ -7,6 +7,9 @@ const inter = Inter({ subsets: ['latin', 'cyrillic'] });
 export const metadata: Metadata = {
   title: 'Code Learning Platform',
   description: 'Образовательная платформа для изучения Python и C++',
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
