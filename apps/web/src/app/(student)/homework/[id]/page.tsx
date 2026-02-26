@@ -48,6 +48,7 @@ export default function HomeworkDetailPage() {
 
   const [homework, setHomework] = useState<HomeworkWithDetails | null>(null);
   const [code, setCode] = useState('');
+  const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [submissionResult, setSubmissionResult] = useState<SubmissionResult | null>(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -100,6 +101,7 @@ export default function HomeworkDetailPage() {
       const response = await apiClient.post('/code/execute', {
         code,
         language: detectLanguage(),
+        input: input || undefined,
       });
 
       if (response.success && response.data) {
@@ -452,6 +454,20 @@ export default function HomeworkDetailPage() {
                     placeholder="Введите код..."
                   />
                 )}
+              </div>
+
+              {/* Input (stdin) field */}
+              <div className="mt-4">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
+                  <Terminal className="w-4 h-4 text-slate-500" />
+                  Входные данные (stdin)
+                </label>
+                <textarea
+                  className="w-full h-24 p-3 font-mono text-sm bg-slate-50 border border-slate-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder:text-slate-400"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Введите входные данные для программы (каждое значение с новой строки)..."
+                />
               </div>
 
               {/* Action buttons */}

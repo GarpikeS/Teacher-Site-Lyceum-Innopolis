@@ -6,6 +6,12 @@ import { requireAdmin } from '../../middleware/rbac.middleware';
 const router = Router();
 
 /**
+ * GET /api/v1/users/stats/public
+ * Get public platform statistics (no auth required)
+ */
+router.get('/stats/public', UsersController.getPublicStats);
+
+/**
  * GET /api/v1/users
  * List users with pagination and optional role filter
  */

@@ -1,7 +1,33 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Code2, Terminal, Braces, BookOpen, Trophy, Zap } from 'lucide-react';
+import { Code2, Terminal, Braces, BookOpen, Trophy, Zap, Users, GraduationCap } from 'lucide-react';
+
+interface PublicStats {
+  totalUsers: number;
+  totalStudents: number;
+  totalTeachers: number;
+}
 
 export default function HomePage() {
+  const [stats, setStats] = useState<PublicStats | null>(null);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/v1/users/stats/public`);
+        const data = await res.json();
+        if (data.success) {
+          setStats(data.data);
+        }
+      } catch (error) {
+        console.error('Failed to load stats', error);
+      }
+    };
+    loadStats();
+  }, []);
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
@@ -25,6 +51,22 @@ export default function HomePage() {
           <p className="text-lg text-slate-300 mt-6 max-w-xl">
             Интерактивная платформа с курсами Python и C++, встроенным редактором кода и автоматической проверкой заданий
           </p>
+
+          {/* Stats badges */}
+          {stats && stats.totalUsers > 0 && (
+            <div className="flex flex-wrap gap-4 mt-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20">
+                <Users className="w-5 h-5 text-indigo-300" />
+                <span className="text-white font-semibold">{stats.totalUsers}</span>
+                <span className="text-slate-300 text-sm">пользователей</span>
+              </div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20">
+                <GraduationCap className="w-5 h-5 text-emerald-300" />
+                <span className="text-white font-semibold">{stats.totalStudents}</span>
+                <span className="text-slate-300 text-sm">учеников</span>
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-4 mt-10">
             <Link href="/login" className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl bg-white text-slate-900 font-semibold text-sm hover:bg-slate-100 transition-colors shadow-lg">

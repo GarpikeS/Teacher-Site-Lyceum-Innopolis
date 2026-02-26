@@ -126,4 +126,21 @@ export class UsersModel {
     const result = await db.query('DELETE FROM users WHERE id = $1', [id]);
     return (result.rowCount || 0) > 0;
   }
+
+  static async getPublicStats(): Promise<{ totalUsers: number; totalStudents: number; totalTeachers: number }> {
+    const result = await db.query<{ total: string; students: string; teachers: string }>(`
+      SELECT
+        COUNT(*) as total,
+        COUNT(*) FILTER (WHERE role = 'student') as students,
+        COUNT(*) FILTER (WHERE role = 'teacher') as teachers
+      FROM users
+      WHERE is_active = true
+    `);
+    const row = result.rows[0];
+    return {
+      totalUsers: parseInt(row.total, 10),
+      totalStudents: parseInt(row.students, 10),
+      totalTeachers: parseInt(row.teachers, 10),
+    };
+  }
 }

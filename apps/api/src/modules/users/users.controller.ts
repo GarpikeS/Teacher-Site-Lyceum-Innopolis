@@ -1,8 +1,29 @@
 import { Request, Response } from 'express';
 import { UsersService } from './users.service';
+import { UsersModel } from './users.model';
 import { logger } from '../../utils/logger';
 
 export class UsersController {
+  /**
+   * GET /api/v1/users/stats/public
+   * Get public platform statistics (no auth required)
+   */
+  static async getPublicStats(_req: Request, res: Response) {
+    try {
+      const stats = await UsersModel.getPublicStats();
+      res.json({
+        success: true,
+        data: stats,
+      });
+    } catch (error: any) {
+      logger.error('Get public stats error', { error: error.message });
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: 'Failed to get stats' },
+      });
+    }
+  }
+
   /**
    * GET /api/v1/users
    * Get all users (admin only)
