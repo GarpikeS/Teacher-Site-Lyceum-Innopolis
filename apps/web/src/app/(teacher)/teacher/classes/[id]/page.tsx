@@ -18,6 +18,10 @@ import {
   AlertCircle,
   Loader2,
   Inbox,
+  Search,
+  UserCheck,
+  Trash2,
+  Calendar,
 } from 'lucide-react';
 
 interface StudentInfo {
@@ -29,6 +33,15 @@ interface StudentInfo {
   completedLessons: number;
   totalSubmissions: number;
   passedSubmissions: number;
+}
+
+interface AvailableUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  createdAt: string;
 }
 
 interface ClassDetail {
@@ -46,12 +59,16 @@ export default function ClassDetailPage() {
 
   const [classData, setClassData] = useState<ClassDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [studentEmail, setStudentEmail] = useState('');
+  const [availableUsers, setAvailableUsers] = useState<AvailableUser[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [addError, setAddError] = useState('');
+  const [removingId, setRemovingId] = useState<string | null>(null);
 
   useEffect(() => {
     loadClass();
+    loadAvailableUsers();
   }, [classId]);
 
   const loadClass = async () => {
@@ -67,22 +84,63 @@ export default function ClassDetailPage() {
     }
   };
 
-  const handleAddStudent = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!studentEmail.trim()) return;
+  const loadAvailableUsers = async () => {
+    try {
+      const response = await apiClient.get<AvailableUser[]>(`/classes/${classId}/available-users`);
+      if (response.success && response.data) {
+        setAvailableUsers(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to load available users', error);
+    }
+  };
+
+  const filteredUsers = availableUsers.filter(user => {
+    const query = searchQuery.toLowerCase();
+    return (
+      user.firstName.toLowerCase().includes(query) ||
+      user.lastName.toLowerCase().includes(query) ||
+      user.email.toLowerCase().includes(query)
+    );
+  });
+
+  const toggleUserSelection = (userId: string) => {
+    setSelectedUsers(prev =>
+      prev.includes(userId)
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
+    );
+  };
+
+  const handleAddSelected = async () => {
+    if (selectedUsers.length === 0) return;
     setIsAdding(true);
     setAddError('');
 
     try {
-      const response = await apiClient.post(`/classes/${classId}/students`, { studentEmail });
-      if (response.success) {
-        setStudentEmail('');
-        loadClass();
+      for (const studentId of selectedUsers) {
+        await apiClient.post(`/classes/${classId}/students`, { studentId });
       }
+      setSelectedUsers([]);
+      loadClass();
+      loadAvailableUsers();
     } catch (error: any) {
-      setAddError(error.message || 'Ученик не найден');
+      setAddError(error.message || 'Ошибка добавления');
     } finally {
       setIsAdding(false);
+    }
+  };
+
+  const handleRemoveStudent = async (studentId: string) => {
+    setRemovingId(studentId);
+    try {
+      await apiClient.delete(`/classes/${classId}/students/${studentId}`);
+      loadClass();
+      loadAvailableUsers();
+    } catch (error: any) {
+      alert(error.message || 'Ошибка удаления');
+    } finally {
+      setRemovingId(null);
     }
   };
 
@@ -154,45 +212,113 @@ export default function ClassDetailPage() {
         </div>
       </div>
 
-      {/* Add Student */}
+      {/* Add Users from List */}
       <div className="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden animate-slide-up">
         <div className="bg-gradient-to-r from-indigo-50 to-blue-50 px-6 py-4 border-b border-indigo-100">
-          <h3 className="font-semibold text-indigo-800 flex items-center gap-2">
-            <UserPlus className="w-4 h-4" />
-            Добавить ученика
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-indigo-800 flex items-center gap-2">
+              <UserPlus className="w-4 h-4" />
+              Добавить участников
+            </h3>
+            <span className="text-xs text-indigo-600 bg-indigo-100 px-2 py-1 rounded-full">
+              {availableUsers.length} доступно
+            </span>
+          </div>
         </div>
         <div className="p-6">
-          <form onSubmit={handleAddStudent} className="flex gap-3 items-end">
-            <div className="flex-1">
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Email ученика</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <Input
-                  type="email"
-                  value={studentEmail}
-                  onChange={(e) => setStudentEmail(e.target.value)}
-                  placeholder="student@school.ru"
-                  required
-                  className="pl-10 rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-400"
-                />
-              </div>
+          {/* Search */}
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Поиск по имени или email..."
+              className="pl-10 rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-400"
+            />
+          </div>
+
+          {/* Available Users List */}
+          {filteredUsers.length === 0 ? (
+            <div className="text-center py-8 text-slate-400">
+              <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">
+                {availableUsers.length === 0
+                  ? 'Все зарегистрированные пользователи уже в классе'
+                  : 'Пользователи не найдены'
+                }
+              </p>
             </div>
-            <Button
-              type="submit"
-              disabled={isAdding}
-              className="bg-indigo-600 hover:bg-indigo-700 rounded-xl px-5"
-            >
-              {isAdding ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <>
-                  <UserPlus className="w-4 h-4 mr-1.5" />
-                  Добавить
-                </>
-              )}
-            </Button>
-          </form>
+          ) : (
+            <>
+              <div className="max-h-64 overflow-y-auto border border-slate-100 rounded-xl divide-y divide-slate-50">
+                {filteredUsers.map((user) => (
+                  <label
+                    key={user.id}
+                    className={`flex items-center gap-3 p-3 cursor-pointer hover:bg-slate-50 transition-colors ${
+                      selectedUsers.includes(user.id) ? 'bg-indigo-50' : ''
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedUsers.includes(user.id)}
+                      onChange={() => toggleUserSelection(user.id)}
+                      className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                      {user.firstName[0]}{user.lastName[0]}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-slate-700 truncate">
+                          {user.firstName} {user.lastName}
+                        </span>
+                        <span className={`text-xs px-1.5 py-0.5 rounded ${
+                          user.role === 'teacher'
+                            ? 'bg-amber-100 text-amber-700'
+                            : 'bg-emerald-100 text-emerald-700'
+                        }`}>
+                          {user.role === 'teacher' ? 'Учитель' : 'Ученик'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-slate-400">
+                        <span className="flex items-center gap-1 truncate">
+                          <Mail className="w-3 h-3" />
+                          {user.email}
+                        </span>
+                        <span className="flex items-center gap-1 shrink-0">
+                          <Calendar className="w-3 h-3" />
+                          {new Date(user.createdAt).toLocaleDateString('ru-RU')}
+                        </span>
+                      </div>
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              {/* Add Selected Button */}
+              <div className="mt-4 flex items-center justify-between">
+                <span className="text-sm text-slate-500">
+                  Выбрано: <span className="font-medium text-indigo-600">{selectedUsers.length}</span>
+                </span>
+                <Button
+                  onClick={handleAddSelected}
+                  disabled={isAdding || selectedUsers.length === 0}
+                  className="bg-indigo-600 hover:bg-indigo-700 rounded-xl px-5"
+                >
+                  {isAdding ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <UserCheck className="w-4 h-4 mr-1.5" />
+                      Добавить выбранных
+                    </>
+                  )}
+                </Button>
+              </div>
+            </>
+          )}
+
           {addError && (
             <div className="flex items-center gap-2 mt-3 text-sm text-red-600 bg-red-50 rounded-xl px-3 py-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
@@ -247,6 +373,7 @@ export default function ClassDetailPage() {
                         <CheckCircle2 className="w-3.5 h-3.5" /> Принято
                       </span>
                     </th>
+                    <th className="py-3 px-2 font-medium text-slate-400 text-xs uppercase tracking-wider text-center w-16"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
@@ -272,6 +399,20 @@ export default function ClassDetailPage() {
                         }`}>
                           {student.passedSubmissions}
                         </span>
+                      </td>
+                      <td className="py-3.5 px-2 text-center">
+                        <button
+                          onClick={() => handleRemoveStudent(student.id)}
+                          disabled={removingId === student.id}
+                          className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                          title="Удалить из класса"
+                        >
+                          {removingId === student.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
+                        </button>
                       </td>
                     </tr>
                   ))}

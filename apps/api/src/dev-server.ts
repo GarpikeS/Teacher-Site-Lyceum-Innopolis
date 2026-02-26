@@ -3816,15 +3816,75 @@ app.post('/api/v1/classes', authenticateToken, requireRole('teacher', 'admin'), 
 });
 
 app.post('/api/v1/classes/:id/students', authenticateToken, requireRole('teacher', 'admin'), (req, res) => {
-  const { studentEmail } = req.body;
-  const student = db.users.find(u => u.email === studentEmail && u.role === 'student');
-  if (!student) return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Student not found' } });
+  const { studentEmail, studentId } = req.body;
+
+  let student;
+  if (studentId) {
+    // Добавление по ID (новый способ - из выпадающего списка)
+    student = db.users.find(u => u.id === studentId);
+  } else if (studentEmail) {
+    // Добавление по email (старый способ)
+    student = db.users.find(u => u.email === studentEmail && u.role === 'student');
+  }
+
+  if (!student) return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Пользователь не найден' } });
 
   const existing = db.classStudents.find(cs => cs.classId === req.params.id && cs.studentId === student.id);
-  if (existing) return res.json({ success: true, message: 'Already in class' });
+  if (existing) return res.json({ success: true, message: 'Уже в классе' });
 
   db.classStudents.push({ classId: req.params.id, studentId: student.id, joinedAt: new Date().toISOString() });
-  res.status(201).json({ success: true, message: 'Student added' });
+  res.status(201).json({ success: true, message: 'Ученик добавлен' });
+});
+
+// Получить всех зарегистрированных пользователей для добавления в класс
+app.get('/api/v1/classes/:id/available-users', authenticateToken, requireRole('teacher', 'admin'), (req, res) => {
+  const classId = req.params.id;
+
+  // Получить ID уже добавленных в класс
+  const existingStudentIds = db.classStudents
+    .filter(cs => cs.classId === classId)
+    .map(cs => cs.studentId);
+
+  // Все пользователи (кроме админов), которых ещё нет в классе
+  const availableUsers = db.users
+    .filter(u => u.role !== 'admin' && !existingStudentIds.includes(u.id))
+    .map(u => ({
+      id: u.id,
+      email: u.email,
+      firstName: u.firstName,
+      lastName: u.lastName,
+      role: u.role,
+      createdAt: u.createdAt,
+    }));
+
+  res.json({ success: true, data: availableUsers });
+});
+
+// Получить всех зарегистрированных пользователей (общий список для учителя)
+app.get('/api/v1/teacher/all-users', authenticateToken, requireRole('teacher', 'admin'), (req, res) => {
+  const users = db.users
+    .filter(u => u.role !== 'admin')
+    .map(u => ({
+      id: u.id,
+      email: u.email,
+      firstName: u.firstName,
+      lastName: u.lastName,
+      role: u.role,
+      isActive: u.isActive,
+      createdAt: u.createdAt,
+    }));
+
+  res.json({ success: true, data: users });
+});
+
+// Удалить студента из класса
+app.delete('/api/v1/classes/:id/students/:studentId', authenticateToken, requireRole('teacher', 'admin'), (req, res) => {
+  const { id: classId, studentId } = req.params;
+  const idx = db.classStudents.findIndex(cs => cs.classId === classId && cs.studentId === studentId);
+  if (idx === -1) return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Ученик не найден в классе' } });
+
+  db.classStudents.splice(idx, 1);
+  res.json({ success: true, message: 'Ученик удалён из класса' });
 });
 
 // Teacher dashboard stats
