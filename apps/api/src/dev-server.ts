@@ -3861,7 +3861,7 @@ app.get('/api/v1/classes/:id/available-users', authenticateToken, requireRole('t
 });
 
 // Получить всех зарегистрированных пользователей (общий список для учителя)
-app.get('/api/v1/teacher/all-users', authenticateToken, requireRole('teacher', 'admin'), (req, res) => {
+app.get('/api/v1/teacher/all-users', authenticateToken, requireRole('teacher', 'admin'), (_req, res) => {
   const users = db.users
     .filter(u => u.role !== 'admin')
     .map(u => ({
